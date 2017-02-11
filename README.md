@@ -1,14 +1,14 @@
-# pt-flowgrid
+# flowgrid
 flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局插件
 
 ### DEMO地址
 
-[https://pt-fed.github.io/pt-flowgrid/](https://pt-fed.github.io/pt-flowgrid/)
+<!-- [https://tm-roamer.github.io/flowgrid/](https://tm-roamer.github.io/flowgrid/) -->
 
 ### 先上图,再逼逼
   
-  ![github](https://github.com/PT-FED/pt-flowgrid/blob/master/doc/demo_small_1.gif?raw=true "demo")
-  ![github](https://github.com/PT-FED/pt-flowgrid/blob/master/doc/demo_small_2.gif?raw=true "demo")
+  ![github](https://github.com/tm-roamer/flowgrid/blob/master/doc/demo_small_1.gif?raw=true "demo")
+  ![github](https://github.com/tm-roamer/flowgrid/blob/master/doc/demo_small_2.gif?raw=true "demo")
 
 ### 简介
 那我开始逼逼了哈, 引用的插件[gridstack](https://github.com/troolee/gridstack.js)满足不了我们产品的需求, 那就自己写个吧, 一写就是小一个月.
@@ -33,7 +33,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 
 	 	-	-	-	-	-	-	-	-	-	-	-	-
 
-   ![github](https://github.com/PT-FED/pt-flowgrid/blob/master/doc/demo.png?raw=true "demo")
+   ![github](https://github.com/tm-roamer/flowgrid/blob/master/doc/demo.png?raw=true "demo")
 
 ### 设计思路
 这个插件的设计原则就是: 就是不依赖任何框架和库, 只和css打交道. 不拆散源码, 提供一个完整的源文件, 扔哪都能用.
@@ -50,6 +50,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 
 	(1) 不支持多个面板之间的拖拽
 	(2) 节点块上下左右四个角四个边的拖拽
+	(3) 移动端和pad端的拖拽
 
 ### 基础实例
 
@@ -62,13 +63,13 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 		    </head>
 		    <body>
 		      	<!-- 外层容器 -->
-	    		<div class="pt-flowgrid-container">
+	    		<div class="fg-container">
 		            <!-- 节点块 -->
-		            <div class="pt-flowgrid-item" data-fg-x="0" data-fg-y="0" data-fg-w="4" data-fg-h="2">
+		            <div class="fg-item" data-fg-x="0" data-fg-y="0" data-fg-w="4" data-fg-h="2">
 		                <!-- 内容区, 摆放展示内容 -->
-		                <div class="pt-flowgrid-item-content">1</div>
+		                <div class="fg-item-content">1</div>
 		                <!-- 放大缩小句柄, 隐藏或删除则不能放大缩小 -->
-		                <div class="pt-flowgrid-item-zoom"></div>
+		                <div class="fg-item-zoom"></div>
 		            </div>
 	    		</div>
 		      <script type="text/javascript" src="flowgrid.js"></script>

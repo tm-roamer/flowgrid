@@ -1,7 +1,7 @@
 'use strict';
 /**
  * Copyright (c) 2016 tm-roamer
- * https://github.com/PT-FED/pt-flowgrid
+ * https://github.com/tm-roamer/flowgrid
  * version: 1.1.0
  * 描述: 可拖拽流式布局
  * 原则和思路:  不依赖任何框架和类库, 通过指定classname进行配置, 实现view层的拖拽, 只和css打交道.

@@ -13,12 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PT-FED/pt-flowgrid.git"
+    "url": "git+https://github.com/tm-roamer/flowgrid.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/PT-FED/pt-flowgrid/issues"
+    "url": "https://github.com/tm-roamer/flowgrid/issues"
   },
-  "homepage": "https://github.com/PT-FED/pt-flowgrid#readme",
+  "homepage": "https://github.com/tm-roamer/flowgrid#readme",
   "devDependencies": {}
 }
