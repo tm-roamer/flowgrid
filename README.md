@@ -1,15 +1,15 @@
 # flowgrid
 flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局插件
 
-### 免责声明()
+### 免责声明(一直找时间更新代码, 目前不建议使用)
 
     (1) 因为大面积调整代码, 导致 echarts 和 highchart 的 示例不可用
-    (2) safari 下 节点数量超过50(且装载图表), 会有卡顿现象,
+    (2) safari 下 节点数量超过50(每个节点都装载图表), 会有卡顿现象,
     (3) 代码逻辑有待优化, 不够清晰直观.
 
 ### DEMO地址
 
-<!-- [https://tm-roamer.github.io/flowgrid/](https://tm-roamer.github.io/flowgrid/) -->
+ [https://tm-roamer.github.io/flowgrid/](https://tm-roamer.github.io/flowgrid/) 
 
 ### 先上图,再逼逼
   
