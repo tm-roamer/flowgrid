@@ -13,8 +13,8 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 
 ### 先上图,再逼逼
   
-  ![github](https://github.com/tm-roamer/flowgrid/blob/master/doc/demo_small_1.gif?raw=true "demo")
-  ![github](https://github.com/tm-roamer/flowgrid/blob/master/doc/demo_small_2.gif?raw=true "demo")
+  ![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo_small_1.gif?raw=true "demo")
+  ![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo_small_2.gif?raw=true "demo")
 
 ### 简介
 那我开始逼逼了哈, 引用的插件[gridstack](https://github.com/troolee/gridstack.js)满足不了我们产品的需求, 那就自己写个吧, 一写就是小一个月.
@@ -39,7 +39,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 
 	 	-	-	-	-	-	-	-	-	-	-	-	-
 
-   ![github](https://github.com/tm-roamer/flowgrid/blob/master/doc/demo.png?raw=true "demo")
+   ![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo.png?raw=true "demo")
 
 ### 设计思路
 这个插件的设计原则就是: 就是不依赖任何框架和库, 只和css打交道. 不拆散源码, 提供一个完整的源文件, 扔哪都能用.
