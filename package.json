@@ -1,13 +1,15 @@
 {
   "name": "flowgrid",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "author": "tm-roamer",
   "description": "flowgrid.js is a plugin for widget layout",
   "main": "./dist/flowgrid.js",
   "module": "./src/index.js",
   "scripts": {
-    "dev": "./node_modules/.bin/webpack --config webpack.dev.config.js --progress",
-    "prod": "./node_modules/.bin/webpack --config webpack.dev.config.js --progress"
+    "build": "./node_modules/.bin/rollup --config",
+    "dev": "./node_modules/.bin/rollup --config --watch",
+    "min": "./node_modules/.bin/uglifyjs docs/flowgrid.js -c -m -o docs/flowgrid.min.js --source-map",
+    "prod": "npm run build && npm run min"
   },
   "repository": {
     "type": "git",
@@ -20,12 +22,17 @@
   "homepage": "https://github.com/tm-roamer/flowgrid#readme",
   "devDependencies": {
     "babel-core": "^6.22.1",
-    "babel-loader": "^6.2.10",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-plugin-transform-runtime": "^6.22.0",
     "babel-preset-env": "^1.3.2",
+    "babel-preset-latest": "^6.24.1",
     "babel-preset-stage-2": "^6.22.0",
     "babel-register": "^6.22.0",
-    "webpack": "^2.6.1"
+    "rollup": "^0.42.0",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-json": "^2.3.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-watch": "^3.2.2"
   }
 }

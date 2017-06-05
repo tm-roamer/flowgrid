@@ -1,3 +1,9 @@
+import {CONSTANT, globalConfig} from './config';
+import cache from './cache';
+import handleEvent from './event';
+import dragdrop from './dragdrop';
+import view from './view';
+import Flowgrid from './api';
 
 // 工具类
 var utils = {
@@ -25,7 +31,7 @@ var utils = {
     throttle: function (now) {
         var time = new Date().getTime();
         this.throttle = function (now) {
-            if (now - time > THROTTLE_TIME) {
+            if (now - time > CONSTANT.THROTTLE_TIME) {
                 time = now;
                 return true;
             }
