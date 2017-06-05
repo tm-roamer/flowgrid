@@ -1,7 +1,7 @@
-# flowgrid
+# flowgrid (迁移到)
 flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局插件
 
-### 免责声明(一直找时间更新代码, 目前不建议使用)
+### 免责声明(开始维护啦. 哈哈哈哈)
 
     (1) 因为大面积调整代码, 导致 echarts 和 highchart 的 示例不可用
     (2) safari 下 节点数量超过50(每个节点都装载图表), 会有卡顿现象,
