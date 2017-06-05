@@ -1,4 +1,4 @@
-# 统一结束符和tab缩进 http://EditorConfig.org
+# 统一文件结束符和编码和tab缩进 http://EditorConfig.org
 
 root = true
 
