@@ -1,43 +1,6 @@
 
-import {CONSTANT, globalConfig} from './config';
-import cache from './cache';
-import utils from './utils';
-import handleEvent from './event';
-import dragdrop from './dragdrop';
-import view from './view';
-
-// 网格对象
-function Flowgrid(options, container, originalData) {
-	// 兼容多种配置情况
-	if (Array.isArray(options) && originalData === undefined) {
-		originalData = options;
-		options = undefined;
-	}
-	this.init(options, container, originalData);
-}
-
 // 网格对象原型
 Flowgrid.prototype = {
-	constructor: Flowgrid,
-	init: function (options, container, originalData) {
-		var opt = utils.extend(globalConfig, options);
-		this.originalData = [];
-		this.area = [];
-		this.data = [];
-		this.elements = {};
-		this.opt = opt;
-		this.opt.container = container;
-		this.computeCellScale(opt);
-		if (originalData) {
-			this.setData(originalData)
-		} else {
-			var arr = view.dom2obj(container, this);
-			if (arr && arr.length > 0) {
-				this.setData(arr);
-			}
-		}
-		return this;
-	},
 	destroy: function () {
 		this.originalData = null;
 		this.opt = null;
@@ -51,19 +14,6 @@ Flowgrid.prototype = {
 		this.area = [];
 		this.data = [];
 		this.elements = {};
-		return this;
-	},
-	loadDom: function (isload) {
-		if (isload === undefined || isload === true) {
-			this.originalData = [];
-			this.area = [];
-			this.data = [];
-			this.elements = {};
-			var arr = view.dom2obj(this.opt.container, this);
-			if (arr && arr.length > 0) {
-				this.setData(arr);
-			}
-		}
 		return this;
 	},
 	load: function (isload) {
@@ -93,16 +43,6 @@ Flowgrid.prototype = {
 		this.computeCellScale(opt);
 		this.load();
 	},
-	// 计算最小网格宽高
-	computeCellScale: function (opt) {
-		opt.containerW = opt.container.clientWidth;
-		opt.containerH = opt.container.clientHeight;
-		opt.cellW = opt.containerW / opt.col;
-		opt.cellH = opt.cellW / opt.cellScale.w * opt.cellScale.h;
-		opt.cellW_Int = Math.floor(opt.cellW);
-		opt.cellH_Int = Math.floor(opt.cellH);
-		return this;
-	},
 	// 设置数据
 	setData: function (originalData, isload) {
 		// 遍历原始数据
@@ -119,53 +59,9 @@ Flowgrid.prototype = {
 		}
 		return this;
 	},
-	sortData: function (data) {
-		data.sort(function (a, b) {
-			var y = a.y - b.y
-			return y === 0 ? a.x - b.x : y;
-		});
-		return this;
-	},
-	// 构建网格区域
-	buildArea: function (area, row, col) {
-		if (area && Array.isArray(area)) {
-			for (var r = 0; r < row; r++) {
-				area[r] = new Array(col);
-			}
-		}
-		return this;
-	},
-	// 将数据铺进网格布局
-	putData: function (area, data) {
-		var i, r, c, len, rlen, clen, node;
-		for (i = 0, len = data.length; i < len; i++) {
-			node = data[i];
-			for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
-				for (c = node.x, clen = node.x + node.w; c < clen; c++) {
-					area[r][c] = node.id;
-				}
-			}
-		}
-		return this;
-	},
-	// 取得区域中的最大行和列
-	getMaxRowAndCol: function (opt, data) {
-		var opt = opt || this.opt,
-			data = data || this.data,
-			i, n, len, max = {row: opt.row, col: opt.col};
-		if (data && data.length > 0) {
-			for (i = 0, len = data.length; i < len; i++) {
-				n = data[i];
-				if (n.y + n.h > max.row) {
-					max.row = n.y + n.h;
-				}
-				if (n.x + n.w > max.col) {
-					max.col = n.x + n.w;
-				}
-			}
-		}
-		return max;
-	},
+
+
+
 	add: function (n, isload) {
 		var node,
 			self = this,
@@ -190,38 +86,6 @@ Flowgrid.prototype = {
 	// 取得节点空位
 	getVacant: function (w, h) {
 		return this.addAutoNode(this.area, this.data, {x: 0, y: 0, w: w, h: h});
-	},
-	// 自动扫描空位添加节点
-	addAutoNode: function (area, data, node) {
-		if (data.length === 0) return node;
-		var r, c, maxCol = area[0].length;
-		for (r = 0; r < area.length; r = r + 1) {
-			node.y = r;
-			for (c = 0; c < area[0].length; c = c + 1) {
-				node.x = c;
-				if (node.x + node.w > maxCol) {
-					node.x = 0;
-				}
-				if (!this.collision(area, node))
-					return node;
-			}
-		}
-		node.x = 0;  // area区域都占满了, 另起一行
-		node.y = r;
-		return node;
-	},
-	// 碰撞检测
-	collision: function (area, node) {
-		var r, c, rlen, clen;
-		// 从左到右, 从上到下
-		for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
-			for (c = node.x, clen = node.x + node.w; c < clen; c++) {
-				if (area[r] && (area[r][c] || area[r][c] == 0)) {
-					return true;
-				}
-			}
-		}
-		return false;
 	},
 	delete: function (id, isload) {
 		var self = this,
@@ -257,16 +121,6 @@ Flowgrid.prototype = {
 				};
 			}
 		}
-	},
-	setDraggable: function (draggable) {
-		var opt = this.opt;
-		view.setContainerAttr(opt.container, opt, draggable, undefined);
-		return this;
-	},
-	setResizable: function (resizable) {
-		var opt = this.opt;
-		view.setContainerAttr(opt.container, opt, undefined, resizable);
-		return this;
 	},
 	// 检测脏数据
 	checkIndexIsOutOf: function (area, node, isResize) {
@@ -343,57 +197,6 @@ Flowgrid.prototype = {
 			}
 		}
 		return this;
-	},
-	// 流布局
-	layout: function (area, data) {
-		var i, len, r, node;
-		// 原理: 遍历数据集, 碰撞检测, 修改node.y, 进行上移.
-		for (i = 0, len = data.length; i < len; i++) {
-			node = data[i];
-			r = this.findEmptyLine(area, node);
-			if (node.y > r) {
-				this.moveUp(area, node, r);
-			}
-		}
-		return this;
-	},
-	// 寻找空行
-	findEmptyLine: function (area, node) {
-		var r, c, len, cell;
-		// 扫描, 找到最接近顶部的空行是第几行
-		for (r = node.y - 1; r >= 0; r--) {
-			for (c = node.x, len = node.x + node.w; c < len; c++) {
-				cell = area[r][c];
-				if (cell || cell == 0) {
-					return r + 1;
-				}
-			}
-		}
-		return 0;
-	},
-	// 上移
-	moveUp: function (area, node, newRow) {
-		this.replaceNodeInArea(area, node);
-		var r, c, rlen, clen;
-		node.y = newRow;
-		for (r = node.y, rlen = node.y + node.h; r < rlen; r++)
-			for (c = node.x, clen = node.x + node.w; c < clen; c++)
-				area[r][c] = node.id;
-	},
-	// 替换区域中的节点
-	replaceNodeInArea: function (area, node, id) {
-		var r, c, rlen, clen;
-		for (r = node.y, rlen = node.y + node.h; r < rlen; r++)
-			for (c = node.x, clen = node.x + node.w; c < clen; c++)
-				area[r] && (area[r][c] = id);
-		return this;
-	},
-	clone: function (node) {
-		var obj = {};
-		for (var attr in node)
-			if (node.hasOwnProperty(attr))
-				obj[attr] = node[attr];
-		return obj;
 	}
 };
 

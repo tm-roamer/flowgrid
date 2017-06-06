@@ -1,9 +1,7 @@
 import {CONSTANT, globalConfig} from './config';
-import cache from './cache';
 import utils from './utils';
 import dragdrop from './dragdrop';
 import view from './view';
-import Flowgrid from './api';
 
 // 事件处理对象
 let handleEvent = {

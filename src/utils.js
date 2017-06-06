@@ -1,20 +1,7 @@
-import {CONSTANT} from './config';
+const THROTTLE_TIME = 14;  // 节流函数的间隔时间单位ms, FPS : 1000 / CONSTANT.THROTTLE_TIME
 
 // 工具类
 let utils = {
-    // 属性拷贝
-    extend: function(mod, opt) {
-        if (!opt) return mod;
-        var conf = {};
-        for (var attr in mod) {
-            if (typeof opt[attr] !== "undefined") {
-                conf[attr] = opt[attr];
-            } else {
-                conf[attr] = mod[attr];
-            }
-        }
-        return conf;
-    },
     // 空对象
     isEmptyObject: function (obj) {
         for (var i in obj) {
@@ -26,34 +13,13 @@ let utils = {
     throttle: function (now) {
         var time = new Date().getTime();
         this.throttle = function (now) {
-            if (now - time > CONSTANT.THROTTLE_TIME) {
+            if (now - time > THROTTLE_TIME) {
                 time = now;
                 return true;
             }
             return false;
         };
         this.throttle(now);
-    },
-    // 执行回调
-    callbackFun: function (ck) {
-        try {
-            typeof ck === 'function' && ck();
-        } catch (ex) {
-            throw new Error('flowgrid callback exception:' + ex);
-        }
-    },
-    // 构建节点
-    buildNode: function (n, id, opt) {
-        var node = {
-            id: n.id || id,
-            x: n.x,
-            y: n.y,
-            w: n.w || n.minW || opt.nodeMinW,
-            h: n.h || n.minH || opt.nodeMinH,
-            minW: n.minW || opt.nodeMinW,
-            minH: n.minH || opt.nodeMinH,
-        };
-        return node;
     }
 };
 

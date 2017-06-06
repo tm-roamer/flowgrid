@@ -1,71 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title></title>
-        <link rel="stylesheet" type="text/css" href="../docs/flowgrid.css">
-        <style type="text/css">
-            html, body {
-                margin: 0;
-                padding: 0;
-                height: 100%;
-            }
-            .fg-container {
-                background-color: #b3ee22;
-                width: 96%;
-                height: 100%;
-                margin-left: 2%;
-                margin-right: 2%;
-            }
-            .fg-item-content {
-                background-color: #ff9800;
-            }
-        </style>
-    </head>
-    <body>
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <link rel="stylesheet" type="text/css" href="../docs/flowgrid.css">
+  <style type="text/css">
+    html, body, #app {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
 
-        <!-- 外层容器, 用于定制样式和高度 -->
-        <!--<div class="fg-container">-->
-            <!--&lt;!&ndash; 布局区 &ndash;&gt;-->
-            <!--<div class="fg-layout">-->
-                <!--&lt;!&ndash; 布局方块 &ndash;&gt;-->
-                <!--<div class="fg-item" data-fg-x="0" data-fg-y="0" data-fg-w="4" data-fg-h="4">-->
-                    <!--&lt;!&ndash; 我们实际使用的内容区 &ndash;&gt;-->
-                    <!--<div class="fg-item-content">1</div>-->
-                    <!--&lt;!&ndash; 放大缩小句柄, 隐藏或删除就不能放大缩小了 &ndash;&gt;-->
-                    <!--<div class="fg-zoom-bar">-->
-                        <!--<svg class="fg-zoom-bar-ico" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M1.280871 1021.46073 1022.719129 1024 1022.719129 0Z" p-id="2030"></path></svg>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
-        <!--</div>-->
+<div id="app">
+  <fg-container :setting="setting"
+                :nodes="nodes"
+                @addnode="addNode">
+    <fg-item :node="nodes[0]">
+      123
+    </fg-item>
+    <fg-item :node="nodes[1]">
+      345
+    </fg-item>
+  </fg-container>
+</div>
 
-        <div id="app">
-          <fg-container>
-            <fg-item>
-              123
-            </fg-item>
-            <fg-item>
-              345
-            </fg-item>
-            <fg-item>
-              678
-            </fg-item>
-          </fg-container>
-        </div>
+<script src="../node_modules/vue/dist/vue.js"></script>
+<script src="../docs/flowgrid.js"></script>
+<script>
 
-        <script src="../node_modules/vue/dist/vue.js"></script>
-        <script src="../docs/flowgrid.js"></script>
-        <script>
-
-          var vm = new Vue({
-            el: '#app',
-            components: {
-              'fg-container': flowgrid.fgContainer,
-              'fg-item': flowgrid.fgItem
-            }
-          });
-//          flowgrid.instance();
-        </script>
-    </body>
+  new Vue({
+    el: '#app',
+    data: function () {
+      return {
+        setting: {
+          containerW: 1200      // @fix 这个必须指定
+        },
+        nodes: [
+          {id: '1', x: 0, y: 0, w: 3, h: 2},
+          {id: '2', x: 3, y: 0, w: 3, h: 2}
+        ]
+      }
+    },
+    methods: {
+      addNode: function(node) {
+        // console.log(node); // 获取位置信息
+      }
+    },
+    components: {
+      'fg-container': flowgrid.fgContainer,
+      'fg-item': flowgrid.fgItem
+    }
+  });
+</script>
+</body>
 </html>
