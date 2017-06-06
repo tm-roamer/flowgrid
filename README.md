@@ -1,6 +1,18 @@
 # flowgrid (迁移到)
 flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局插件
 
+我比较懒, docs是github.io的展示页面, 就把构建后代码放在这里了, 没有放入dist中. 见谅.
+
+拥抱vue
+
+发布npm
+
+完善文档
+
+完善demo 演示地址
+
+css样式要说明一下
+
 ### 免责声明(开始维护啦. 哈哈哈哈)
 
     (1) 因为大面积调整代码, 导致 echarts 和 highchart 的 示例不可用
@@ -9,12 +21,11 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 
 ### DEMO地址
 
- [https://tm-roamer.github.io/flowgrid/](https://tm-roamer.github.io/flowgrid/) 
+ [https://tm-roamer.github.io/flowgrid/](https://tm-roamer.github.io/flowgrid/)
 
 ### 先上图,再逼逼
-  
+
   ![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo_small_1.gif?raw=true "demo")
-  ![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo_small_2.gif?raw=true "demo")
 
 ### 简介
 那我开始逼逼了哈, 引用的插件[gridstack](https://github.com/troolee/gridstack.js)满足不了我们产品的需求, 那就自己写个吧, 一写就是小一个月.
@@ -23,16 +34,16 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 其实里面就是一个二维数组的网格布局, 数字就是一个个小块, 然后碰撞检测, 上移.
 
 
-		0	0	3	3	-	6	6	9	9	12	12	- 
+		0	0	3	3	-	6	6	9	9	12	12	-
 
 		0	0	3	3	-	6	6	9	9	12	12	-
 
 		-	-	2	2	2	5	5	8	8	11	11	-
-  
+
 	 	-	-	1	1	-	5	5	8	8	11	11	-
-  
+
 	 	-	-	1	1	-	4	4	7	7	10	10	-
-  
+
 	 	-	-	1	1	-	4	4	7	7	10	10	-
 
 	 	-	-	-	-	-	-	-	-	-	-	-	-
@@ -90,7 +101,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 		        	// var grid = flowgrid.instance({各种配置}, 外层容器dom对象, [原始数据,格式:{x,y,w,h}]);
 		      </script>
 		    </body>
-		</html>  
+		</html>
 
 ### 配置说明
 
@@ -109,7 +120,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 		            top: 5,
 		            left: 5,
 		            right: 5,
-		            bottom: 5   
+		            bottom: 5
 		        },
 		        cellScale: {                                       // 单元格的宽高比例, 默认16:9
 		            w: 16,
@@ -144,7 +155,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 		var grid = flowgrid.instance({..各种基础配置..}, undefined, [格式:{x,y,w,h}])
 		grid.area; // 取得布局网格二维数组
 		grid.data; // 取得所有渲染数据
-		
+
 
 ### flowgrid对象的属性和方法
 <table>
@@ -422,6 +433,6 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 		</tr>
 	</tbody>
 </table>
-  
+
 ### 版权
   MIT

@@ -1,12 +1,7 @@
-import {CONSTANT, globalConfig} from './config';
-import cache from './cache';
-import handleEvent from './event';
-import dragdrop from './dragdrop';
-import view from './view';
-import Flowgrid from './api';
+import {CONSTANT} from './config';
 
 // 工具类
-var utils = {
+let utils = {
     // 属性拷贝
     extend: function(mod, opt) {
         if (!opt) return mod;

@@ -6,6 +6,7 @@
   "main": "./dist/flowgrid.js",
   "module": "./src/index.js",
   "scripts": {
+    "example": "./node_modules/.bin/webpack --config ./build/webpack.conf.js",
     "build": "./node_modules/.bin/rollup --config",
     "dev": "./node_modules/.bin/rollup --config --watch",
     "min": "./node_modules/.bin/uglifyjs docs/flowgrid.js -c -m -o docs/flowgrid.min.js --source-map",
@@ -31,8 +32,12 @@
     "babel-register": "^6.22.0",
     "rollup": "^0.42.0",
     "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-css-only": "^0.2.0",
     "rollup-plugin-json": "^2.3.0",
     "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-watch": "^3.2.2"
+    "rollup-plugin-vue2": "^0.8.0",
+    "rollup-watch": "^3.2.2",
+    "vue": "^2.3.3"
   }
 }
