@@ -27,7 +27,7 @@
     ],
     computed: {
       itemStyle: function () {
-        let opt = this.$parent.options;
+        let opt = this.$parent.opt;
         let node = this.node;
         return {
           transform: "translate(" + (node.x * opt.cellW_Int) + "px," + (node.y * opt.cellH_Int) + "px)",
@@ -42,7 +42,7 @@
     },
     mounted () {
       // console.log(this.$parent.options);
-      // console.log('2222');
+       console.log('2222');
     }
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="fg-container"
-       :class="{'fg-no-draggable': !options.draggable, 'fg-no-resizable': !options.resizable}">
+       :class="{'fg-no-draggable': !opt.draggable, 'fg-no-resizable': !opt.resizable}">
     <div class="fg-layout">
       <slot></slot>
       <div class="fg-item-dragdrop"></div>
@@ -39,53 +39,6 @@
   }
 
   let core = {
-    // 取得区域中的最大行和列
-    getMaxRowAndCol: function (opt, data) {
-      var opt = opt || this.opt,
-        data = data || this.data,
-        i, n, len, max = {row: opt.row, col: opt.col};
-      if (data && data.length > 0) {
-        for (i = 0, len = data.length; i < len; i++) {
-          n = data[i];
-          if (n.y + n.h > max.row) {
-            max.row = n.y + n.h;
-          }
-          if (n.x + n.w > max.col) {
-            max.col = n.x + n.w;
-          }
-        }
-      }
-      return max;
-    },
-    sortData: function (data) {
-      data.sort(function (a, b) {
-        var y = a.y - b.y
-        return y === 0 ? a.x - b.x : y;
-      });
-      return this;
-    },
-    // 构建网格区域
-    buildArea: function (area, row, col) {
-      if (area && Array.isArray(area)) {
-        for (var r = 0; r < row; r++) {
-          area[r] = new Array(col);
-        }
-      }
-      return this;
-    },
-    // 将数据铺进网格布局
-    putData: function (area, data) {
-      var i, r, c, len, rlen, clen, node;
-      for (i = 0, len = data.length; i < len; i++) {
-        node = data[i];
-        for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
-          for (c = node.x, clen = node.x + node.w; c < clen; c++) {
-            area[r][c] = node.id;
-          }
-        }
-      }
-      return this;
-    },
     // 流布局
     layout: function (area, data) {
       var i, len, r, node;
@@ -139,19 +92,6 @@
         .layout(area, data);
       view.render(data, elements, opt.container, this);
     },
-    // 碰撞检测
-    collision: function (area, node) {
-      var r, c, rlen, clen;
-      // 从左到右, 从上到下
-      for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
-        for (c = node.x, clen = node.x + node.w; c < clen; c++) {
-          if (area[r] && (area[r][c] || area[r][c] == 0)) {
-            return true;
-          }
-        }
-      }
-      return false;
-    },
   }
 
   export default {
@@ -161,14 +101,10 @@
       'nodes'
     ],
     computed: {
-      options: function () {
-        let opt = Object.assign({}, globalConfig, this.setting || {});
-        // 计算单元格的尺寸
-        opt.cellW = opt.containerW / opt.col;
-        opt.cellH = opt.cellW / opt.cellScale.w * opt.cellScale.h;
-        opt.cellW_Int = Math.floor(opt.cellW);
-        opt.cellH_Int = Math.floor(opt.cellH);
-        return opt;
+      opt: function () {
+        let options = Object.assign({}, globalConfig, this.setting || {});
+        this.computeCell(options);
+        return options;
       }
     },
     data () {
@@ -177,33 +113,104 @@
       }
     },
     methods: {
+      // 计算单元格
+      computeCell: function (opt) {
+        opt.cellW = opt.containerW / opt.col;
+        opt.cellH = opt.cellW / opt.cellScale.w * opt.cellScale.h;
+        opt.cellW_Int = Math.floor(opt.cellW);
+        opt.cellH_Int = Math.floor(opt.cellH);
+      },
+      init: function () {
+        this.buildArea();
+      },
+      // 构建网格区域
+      buildArea: function () {
+        let max = this.getMaxRowAndCol();
+        for (let r = 0; r < max.row; r++) {
+          this.area[r] = new Array(max.col);
+        }
+        this.putNodes();
+      },
+      // 取得区域中的最大行和列
+      getMaxRowAndCol: function () {
+        let opt = this.opt;
+        let nodes = this.nodes;
+        let max = {
+          row: opt.row,
+          col: opt.col
+        };
+        if (nodes && nodes.length > 0) {
+          for (let n of nodes) {
+            if (n.y + n.h > max.row) {
+              max.row = n.y + n.h;
+            }
+            if (n.x + n.w > max.col) {
+              max.col = n.x + n.w;
+            }
+          }
+        }
+        return max;
+      },
+      // 将数据铺进网格布局
+      putNodes: function () {
+        let r, c, rlen, clen;
+        for (let node of this.nodes) {
+          for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
+            for (c = node.x, clen = node.x + node.w; c < clen; c++) {
+              this.area[r][c] = node.id;
+            }
+          }
+        }
+      },
       // 自动扫描空位添加节点
-      addNode: function (area, data, node) {
-//        if (data.length === 0) return node;
-//        var r, c, maxCol = area[0].length;
-//        for (r = 0; r < area.length; r = r + 1) {
-//          node.y = r;
-//          for (c = 0; c < area[0].length; c = c + 1) {
-//            node.x = c;
-//            if (node.x + node.w > maxCol) {
-//              node.x = 0;
-//            }
-//            if (!this.collision(area, node))
-//              return node;
-//          }
-//        }
-//        node.x = 0;  // area区域都占满了, 另起一行
-//        node.y = r;
-        this.$emit('addnode', {x: 0})
+      getNodeCoord: function (node) {
+        let nodes = this.nodes;
+        let area = this.area;
+        if (nodes.length === 0) return node;
+        var r, c, maxCol = area[0].length;
+        for (r = 0; r < area.length; r = r + 1) {
+          node.y = r;
+          for (c = 0; c < area[0].length; c = c + 1) {
+            node.x = c;
+            if (node.x + node.w > maxCol) {
+              node.x = 0;
+            }
+            if (!this.collision(area, node))
+              return node;
+          }
+        }
+        node.x = 0;  // area区域都占满了, 另起一行
+        node.y = r;
+        return node;
+      },
+      // 碰撞检测
+      collision: function (area, node) {
+        var r, c, rlen, clen;
+        // 从左到右, 从上到下
+        for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
+          for (c = node.x, clen = node.x + node.w; c < clen; c++) {
+            if (area[r] && (area[r][c] || area[r][c] == 0)) {
+              return true;
+            }
+          }
+        }
+        return false;
       },
     },
+    created () {
+      // 早于 fg-item mounted 方法执行
+      this.init();
+    },
+    beforeUpdate () {
+      // 数据发送更新, 重置区域
+      this.buildArea();
+      //console.log(this);
+    },
+    updated () {
+      //console.log(this);
+    },
     mounted () {
-      this.addNode();
-      // let el = this.$el;
-      // let opt = this.options;
-      // console.log(this.$el.clientWidth, this.$el.clientHeight);
-      // opt.containerH = el.clientHeight;
-      // opt.containerW = el.clientWidth;
+      //console.log('mounted');
     }
   }
 </script>

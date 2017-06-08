@@ -9,13 +9,6 @@ Flowgrid.prototype = {
 		this.elements = null;
 		return this;
 	},
-	clean: function() {
-		this.originalData = [];
-		this.area = [];
-		this.data = [];
-		this.elements = {};
-		return this;
-	},
 	load: function (isload) {
 		if (isload === undefined || isload === true) {
 			var self = this,
