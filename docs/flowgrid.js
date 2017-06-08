@@ -190,7 +190,7 @@ var fgContainer = {
     this.init();
   },
   beforeUpdate: function beforeUpdate() {
-    // 数据发送更新, 重置区域
+    // 数据更新时重置区域
     this.buildArea();
     //console.log(this);
   },
