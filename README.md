@@ -1,4 +1,5 @@
 # flowgrid (developing)
+
 flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局插件
 
 我比较懒, docs是github.io的展示页面, 就把构建后代码放在这里了, 没有放入dist中. 见谅.
@@ -21,7 +22,7 @@ css样式要说明一下
 
  [https://tm-roamer.github.io/flowgrid/](https://tm-roamer.github.io/flowgrid/)
 
-### 先上图,再逼逼
+### 参考图
 
   ![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo_small_1.gif?raw=true "demo")
 
