@@ -2,32 +2,9 @@
 // 网格对象原型
 Flowgrid.prototype = {
 	destroy: function () {
-		this.originalData = null;
 		this.opt = null;
 		this.area = null;
 		this.data = null;
-		this.elements = null;
-		return this;
-	},
-	load: function (isload) {
-		if (isload === undefined || isload === true) {
-			var self = this,
-				opt = this.opt,
-				area = this.area,
-				data = this.data,
-				elements = this.elements,
-				maxRowAndCol = this.getMaxRowAndCol(opt, data);
-			view.setContainerAttr(opt.container, opt, opt.draggable, opt.draggable);
-			// 重绘
-			this.sortData(data)
-				.buildArea(area, maxRowAndCol.row, maxRowAndCol.col)
-				.putData(area, data)
-				.layout(area, data);
-			view.render(data, elements, opt.container, this);
-			utils.callbackFun(function () {
-				self.opt.onLoad && self.opt.onLoad();
-			});
-		}
 		return this;
 	},
 	resize: function (containerW, containerH) {
@@ -35,74 +12,6 @@ Flowgrid.prototype = {
 			container = opt.container;
 		this.computeCellScale(opt);
 		this.load();
-	},
-	// 设置数据
-	setData: function (originalData, isload) {
-		// 遍历原始数据
-		if (originalData && Array.isArray(originalData)) {
-			this.originalData = originalData;
-			var opt = this.opt,
-				data = this.data = [];
-			// 制作渲染数据
-			originalData.forEach(function (node, idx) {
-				data[idx] = utils.buildNode(node, idx, opt);
-			});
-			// 再刷新
-			this.load(isload);
-		}
-		return this;
-	},
-
-
-
-	add: function (n, isload) {
-		var node,
-			self = this,
-			opt = this.opt,
-			area = this.area,
-			data = this.data;
-		if (n) {
-			node = utils.buildNode(n, (n.id || data.length), opt);
-			this.checkIndexIsOutOf(area, node);
-			this.overlap(data, node);
-		} else {
-			var node = utils.buildNode(opt.autoAddCell, data.length, opt);
-			node = this.addAutoNode(area, node);
-		}
-		data[data.length] = node;
-		this.load(isload);
-		utils.callbackFun(function () {
-			self.opt.onAddNode && self.opt.onAddNode(self.elements[node.id], node);
-		})
-		return node;
-	},
-	// 取得节点空位
-	getVacant: function (w, h) {
-		return this.addAutoNode(this.area, this.data, {x: 0, y: 0, w: w, h: h});
-	},
-	delete: function (id, isload) {
-		var self = this,
-			data = this.data,
-			area = this.area,
-			queryNode = this.query(id),
-			index = queryNode.index,
-			node = queryNode.node;
-		var arr = data.splice(index, 1);
-		view.remove(id);
-		delete this.elements[id];
-		this.replaceNodeInArea(area, node).load(isload);
-		utils.callbackFun(function () {
-			self.opt.onDeleteNode && self.opt.onDeleteNode(self.elements[id], arr[0]);
-		});
-		return arr[0];
-	},
-	edit: function (n, isload) {
-		var node = this.query(n.id).node;
-		for (var k in n) {
-			node[k] = n[k];
-		}
-		this.load(isload);
-		return node;
 	},
 	query: function (id) {
 		var data = this.data;
@@ -192,5 +101,3 @@ Flowgrid.prototype = {
 		return this;
 	}
 };
-
-export default Flowgrid;

@@ -23,7 +23,7 @@
   </div>
   <fg-container :setting="setting"
                 :nodes="nodes">
-    <fg-item  v-for="(node, index) in nodes" :node="node">
+    <fg-item  v-for="(node, index) in nodes" :node="node" :index="index">
       <span>{{widget[index]}}</span>
     </fg-item>
   </fg-container>
@@ -42,7 +42,8 @@
         },
         nodes: [
           {id: '1', x: 0, y: 0, w: 3, h: 2},
-          {id: '2', x: 3, y: 0, w: 3, h: 2}
+          {id: '2', x: 3, y: 0, w: 3, h: 2},
+          {id: '3', x: 6, y: 2, w: 2, h: 2}
         ],
         widget: [
           "我是小部件1",

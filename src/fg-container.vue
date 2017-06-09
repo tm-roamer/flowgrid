@@ -1,5 +1,6 @@
 <template>
   <div class="fg-container"
+       :fg-index="index"
        :class="{'fg-no-draggable': !opt.draggable, 'fg-no-resizable': !opt.resizable}">
     <div class="fg-layout">
       <slot></slot>
@@ -10,89 +11,10 @@
 
 <script>
 
-  // 全局配置
-  let globalConfig = {
-    row: 7,                                            // 网格布局的默认行,默认7行
-    col: 12,                                           // 网格布局的默认列,默认12列
-    distance: 5,                                       // 触发拖拽的拖拽距离,默认5px
-    draggable: true,                                   // 是否允许拖拽, 默认允许
-    resizable: true,                                   // 是否允许缩放, 默认允许
-    nodeMinW: 2,                                       // 节点块的最小宽度, 默认占2格
-    nodeMinH: 2,                                       // 节点块的最小高度, 默认占2格
-    overflow: 5,                                       // 当拖拽或缩放超出网格容器的溢出像素
-    padding: {                                         // 节点块之间的间距, 默认都为5px
-      top: 5,
-      left: 5,
-      right: 5,
-      bottom: 5
-    },
-    cellScale: {                                       // 单元格的宽高比例, 默认16:9
-      w: 16,
-      h: 9
-    },
-    addNodeSize: {                                     // 添加节点的默认尺寸
-      x: 0,
-      y: 0,
-      w: 2,
-      h: 2
-    }
-  }
-
-  let core = {
-    // 流布局
-    layout: function (area, data) {
-      var i, len, r, node;
-      // 原理: 遍历数据集, 碰撞检测, 修改node.y, 进行上移.
-      for (i = 0, len = data.length; i < len; i++) {
-        node = data[i];
-        r = this.findEmptyLine(area, node);
-        if (node.y > r) {
-          this.moveUp(area, node, r);
-        }
-      }
-      return this;
-    },
-    // 寻找空行
-    findEmptyLine: function (area, node) {
-      var r, c, len, cell;
-      // 扫描, 找到最接近顶部的空行是第几行
-      for (r = node.y - 1; r >= 0; r--) {
-        for (c = node.x, len = node.x + node.w; c < len; c++) {
-          cell = area[r][c];
-          if (cell || cell == 0) {
-            return r + 1;
-          }
-        }
-      }
-      return 0;
-    },
-    // 上移
-    moveUp: function (area, node, newRow) {
-      this.replaceNodeInArea(area, node);
-      var r, c, rlen, clen;
-      node.y = newRow;
-      for (r = node.y, rlen = node.y + node.h; r < rlen; r++)
-        for (c = node.x, clen = node.x + node.w; c < clen; c++)
-          area[r][c] = node.id;
-    },
-    // 替换区域中的节点
-    replaceNodeInArea: function (area, node, id) {
-      var r, c, rlen, clen;
-      for (r = node.y, rlen = node.y + node.h; r < rlen; r++)
-        for (c = node.x, clen = node.x + node.w; c < clen; c++)
-          area[r] && (area[r][c] = id);
-      return this;
-    },
-    load: function () {
-      var maxRowAndCol = this.getMaxRowAndCol(opt, data);
-      // 重绘
-      this.sortData(data)
-        .buildArea(area, maxRowAndCol.row, maxRowAndCol.col)
-        .putData(area, data)
-        .layout(area, data);
-      view.render(data, elements, opt.container, this);
-    },
-  }
+  import {globalConfig} from './config'
+  import cache from './cache'
+  import handleEvent from './event'
+  import drag from './dragdrop'
 
   export default {
     name: 'fg-container',
@@ -109,7 +31,8 @@
     },
     data () {
       return {
-        area: []
+        area: [],
+        index: 1,
       }
     },
     methods: {
@@ -121,7 +44,14 @@
         opt.cellH_Int = Math.floor(opt.cellH);
       },
       init: function () {
+        // 初始化监听
+        handleEvent.init(true);
+        // 缓存对象
+        cache.init();
+        this.index = cache.set(this);
+        // 初始矩阵区域并布局
         this.buildArea();
+        this.layout();
       },
       // 构建网格区域
       buildArea: function () {
@@ -183,27 +113,51 @@
         node.y = r;
         return node;
       },
-      // 碰撞检测
+      // 碰撞检测, 从左到右, 从上到下
       collision: function (area, node) {
-        var r, c, rlen, clen;
-        // 从左到右, 从上到下
-        for (r = node.y, rlen = node.y + node.h; r < rlen; r++) {
-          for (c = node.x, clen = node.x + node.w; c < clen; c++) {
-            if (area[r] && (area[r][c] || area[r][c] == 0)) {
+        for (let r = node.y; r < node.y + node.h; r++)
+          for (let c = node.x; c < node.x + node.w; c++)
+            if (area[r] && (area[r][c] || area[r][c] == 0))
               return true;
+      },
+      // 流布局
+      layout: function () {
+        // 原理: 遍历数据集, 寻找节点上面是否有空行, 修改node.y, 进行上移.
+        for (let node of this.nodes) {
+          let y = this.findEmptyLine(node);
+          node.y > y && this.moveUp(node, y);
+        }
+      },
+      // 寻找空行, 扫描找到最接近顶部的空行是第几行
+      findEmptyLine: function (node) {
+        let r, c, cell, area = this.area;
+        for (r = node.y - 1; r >= 0; r--) {
+          for (c = node.x; c < node.x + node.w; c++) {
+            cell = area[r][c];
+            if (cell || cell == 0) {
+              return r + 1;
             }
           }
         }
-        return false;
+        return 0;
       },
+      // 上移
+      moveUp: function (node, newRow, newId) {
+        node.y = newRow;
+        newId && (node.id = newId)
+        for (let r = node.y; r < node.y + node.h; r++)
+          for (let c = node.x; c < node.x + node.w; c++)
+            this.area[r][c] = node.id;
+      }
     },
     created () {
-      // 早于 fg-item mounted 方法执行
+      // 早于fg-item的钩子mounted执行
       this.init();
     },
     beforeUpdate () {
-      // 数据更新时重置区域
+      // 数据更新时重置区域, 并布局
       this.buildArea();
+      this.layout();
       //console.log(this);
     },
     updated () {
@@ -211,6 +165,9 @@
     },
     mounted () {
       //console.log('mounted');
+    },
+    destroyed () {
+      handleEvent.destroy();
     }
   }
 </script>
