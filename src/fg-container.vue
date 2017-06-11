@@ -158,19 +158,6 @@
         this.computeCell(this.opt);
         this.load();
       },
-      // 检测脏数据
-      checkIndexIsOutOf: function (node, isResize) {
-        let area = this.area,
-            col = (area[0] && area[0].length) || this.opt.col;
-        // 数组下标越界检查
-        node.x < 0 && (node.x = 0);
-        node.y < 0 && (node.y = 0);
-        if (isResize) {
-          node.x + node.w > col && (node.w = col - node.x);
-        } else {
-          node.x + node.w > col && (node.x = col - node.w);
-        }
-      },
       // 碰撞检测, 两个矩形是否发生碰撞
       checkHit: function (n, node) {
         var result = false;
@@ -248,7 +235,6 @@
 </script>
 
 <style>
-
   /* 拖拽过程中阻止文本选中 */
   body.fg-user-select-none {
     user-select: none !important;
@@ -337,7 +323,7 @@
     right: 0;
     bottom: 0;
     background: #d3d3d3;
-    z-index: 1;
+    z-index: 2;
   }
 
   /* 拖拽过程中, 被拖拽的节点 */
@@ -377,6 +363,7 @@
     left: 0;
     bottom: 0;
     right: 0;
+    background-color: aqua;
   }
 
 </style>

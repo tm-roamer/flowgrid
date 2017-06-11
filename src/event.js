@@ -34,6 +34,9 @@ let handleEvent = {
 		// 是否点击了拖拽节点
 		let ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
+			if (event.target.classList.contains('fg-item-zoom-bar')) {
+				self.isResize = true;
+			}
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
 			self.distance = globalConfig.distance;
@@ -48,7 +51,7 @@ let handleEvent = {
 		if (!self.ele) return;
 		if (self.dragStart && self.isDrag(event)) {
 			self.dragStart = false;
-			dragdrop.dragStart(event, self.offsetX, self.offsetY, self.ele);
+			dragdrop.dragStart(event, self.offsetX, self.offsetY, self.ele, self.isResize);
 			return;
 		}
 		utils.throttle(new Date().getTime()) && dragdrop.drag(event);
@@ -63,6 +66,7 @@ let handleEvent = {
 		delete self.distanceY;
 		delete self.offsetX;
 		delete self.offsetY;
+		delete self.isResize;
 	},
 	click: function (event) {
 		let self = handleEvent;

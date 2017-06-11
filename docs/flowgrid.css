@@ -1,5 +1,4 @@
 
-
 /* 拖拽过程中阻止文本选中 */
 body.fg-user-select-none {
   user-select: none !important;
@@ -88,7 +87,7 @@ body.fg-user-select-none {
   right: 0;
   bottom: 0;
   background: #d3d3d3;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* 拖拽过程中, 被拖拽的节点 */
@@ -128,6 +127,7 @@ body.fg-user-select-none {
   left: 0;
   bottom: 0;
   right: 0;
+  background-color: aqua;
 }
 
 

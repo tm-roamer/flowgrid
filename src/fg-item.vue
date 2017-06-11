@@ -16,8 +16,8 @@
   export default {
     name: 'fg-item',
     props: [
-      'node', // {id:'2', x: 0, y: 0, w: 4, h: 4}
-      'index'
+      'node', // {id:'2', x: 0, y: 0, w: 4, h: 4, minW: 2, minH: 2}
+      'index' // node在nodes中的索引值
     ],
     computed: {
       itemStyle: function () {
