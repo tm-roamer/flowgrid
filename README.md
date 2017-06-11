@@ -10,9 +10,13 @@ flowgrid.js is a plugin for vue widget layout, 一个基于vue的轻量简单的
 
 flowgrid是vue插件, 使用 babel + rollup + uglifyjs 来进行源码构建.
 
+### 命令
+
+    npm install flowgrid --save-dev
+
 ### npm
 
-[flowgrid的npm地址](https://www.npmjs.com/package/flowgrid). https://www.npmjs.com/package/flowgrid
+npm地址: https://www.npmjs.com/package/flowgrid
 
 ### 参考图
 
@@ -41,6 +45,7 @@ flowgrid是vue插件, 使用 babel + rollup + uglifyjs 来进行源码构建.
 
 v1.2.2
   1. 完善readme文档
+
 v1.2.1
   1. 使用vue来构建源码, 蹭蹭热度, 支持以vue的方式来使用.
   2. 优化了部分代码, 补充注释.
