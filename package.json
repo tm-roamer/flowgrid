@@ -1,8 +1,18 @@
 {
   "name": "flowgrid",
   "version": "1.2.1",
-  "author": "tm-roamer",
-  "description": "flowgrid.js is a plugin for widget layout",
+  "author": {
+    "name": "tm-roamer",
+    "email": "tm165822@163.com"
+  },
+  "description": "flowgrid.js is a plugin for vue widget layout 一个基于vue的轻量简单的网格流布局插件",
+  "keywords": [
+    "vue",
+    "flowgrid",
+    "grid",
+    "flow",
+    "layout"
+  ],
   "main": "./docs/flowgrid.min.js",
   "module": "./src/index.js",
   "scripts": {
@@ -37,6 +47,7 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-vue2": "^0.8.0",
     "rollup-watch": "^3.2.2",
+    "uglifyjs": "^2.4.11",
     "vue": "^2.3.3"
   }
 }

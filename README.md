@@ -1,22 +1,27 @@
 # flowgrid
 
-flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局插件
+flowgrid.js is a plugin for vue widget layout, 一个基于vue的轻量简单的网格流布局插件
 
-因为github中docs是github.io的展示页面目录, 我就把构建后最终代码放在这里了, 没有放入约定俗成的dist目录中. 见谅.
+### 备注
 
-发布npm
-
-完善demo 演示地址
-
-css样式要说明一下
+因为/docs是github.io的默认目录, 我就把构建后代码放这里了, 没有放入约定俗成的/dist中, 见谅.
 
 ### 简介
 
-使用 babel + rollup + vue 构建使用, npm地址:
+flowgrid是vue插件, 使用 babel + rollup + uglifyjs 来进行源码构建.
+
+### npm
+
+
 
 ### 参考图
 
-### 使用说明
+![github](https://github.com/tm-roamer/flowgrid/blob/master/readme/demo_small_1.gif?raw=true "demo")
+
+### 使用方式
+
+
+### 源码说明
 
     fg-item的node属性的数据格式说明:
       {
@@ -33,8 +38,6 @@ css样式要说明一下
 
 ### flowgrid对象的属性和方法
 
-### flowgrid实例的属性和方法
-
 ### 更新日志
 
 v1.2.1
@@ -43,7 +46,6 @@ v1.2.1
   3. 修复缩放拖拽时状态判断不准确的问题
   4. 修复拖拽过程中文本选中的问题, 动态给body加user-select:none
   5. 使用getBoundingClientRect()来计算节点偏移
-  6.
 
 ### 版权
   MIT
