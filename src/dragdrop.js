@@ -1,97 +1,83 @@
-
-import
-import {CONSTANT} from './config'
+import cache from './cache'
 import utils from './utils'
 
 // 拖拽对象
 let dragdrop = {
 	isResize: false,            // 是否放大缩小
-	dragNode: {                 // 拖拽节点的的关联数据
-		id: undefined,          	// 拖拽节点的id
-		node: null,             	// 占位符节点的关联数据
-	},
-	dragElement: null,          // 拖拽的dom节点
+	dragNode: null,             // 拖拽节点的的关联数据
+	dragElement: null,					// 拖拽节点dom
 	dragStart: function (event, offsetX, offsetY, ele) {
-		var classList = event.target.classList;
-		// 取得网格对象
-		var flowgrid = this.flowgrid = cache.get(node);
-		// 配置项, 禁用拖拽
-		if (!flowgrid.opt.draggable) return;
-		// 判断是否放大缩小
-		if (classList.contains(CONSTANT.FG_ITEM_ZOOM_BAR)) {
+		// 判断是否点击了放大缩小
+		if (event.target.classList.contains('fg-item-zoom-bar')) {
 			this.isResize = true;
 		}
-		this.dragElement = node;
-		// 取得当前拖拽节点, 并替换当前拖拽节点id
-		var query = flowgrid.query(node.getAttribute(CONSTANT.FG_ITEM_DATA_ID));
-		if (query) {
-			this.dragElement.className = CONSTANT.FG_ITEM + ' ' + CONSTANT.FG_ITEM_GRAG_DROP;
-			this.dragNode.id = query.node.id;
-			this.dragNode.node = query.node;
-			this.dragNode.node.id = CONSTANT.PLACEHOLDER;
-			// 新增占位符
-			var element = flowgrid.elements[this.dragNode.node.id] = view.create(flowgrid, this.dragNode.node);
-			flowgrid.opt.container.appendChild(element);
-		}
+		// 取得vue网格对象 flowgrid === fg-container.vue
+		var container = this.container = utils.searchUp(ele, 'fg-layout');
+		var flowgrid = this.flowgrid = cache.get(container.getAttribute('index'));
+		// 配置项, 禁用拖拽
+		if (!flowgrid.opt.draggable) return;
+		// 取得当前vue被拖拽节点
+		var item = flowgrid.$children[ele.getAttribute('index') * 1];
+		// 留存备份一份 this.dragNode === fg-item.vue
+		this.dragNode = item;
+		// 将当前vue节点变成占位符, 控制样式
+		item.placeholder = true;
+		// 显示拖拽节点
+		flowgrid.isDrag = true;
+		// 将当前dom节点的内容区复制一份到拖拽节点
+		var dragElement = this.dragElement = container.querySelector('.fg-item-dragdrop');
+		dragElement.setAttribute("style", ele.getAttribute("style"));
+		dragElement.appendChild(ele.querySelector('.fg-item-content').cloneNode(true));
+		// 计算偏移量, 点击节点时: 点击位置与节点的左上角定点的偏移距离
+		var targetOffset = event.target.getBoundingClientRect();
+		var eleOffset = ele.getBoundingClientRect();
+		var containerOffset = container.getBoundingClientRect();
+		this.offsetX = targetOffset.left - eleOffset.left + offsetX || 0;
+		this.offsetY = targetOffset.top - eleOffset.top + offsetY || 0;
+		this.containerX = containerOffset.left;
+		this.containerY = containerOffset.top;
 	},
 	drag: function (event) {
-		if (!this.dragNode.node) return;
-		var flowgrid = this.flowgrid,
-			opt = flowgrid.opt,
-			container = opt.container,
-			containerOffset = view.getOffset(container),    // 取得容器偏移
-			// 相对父元素的偏移坐标x,y
-			translate = this.dragElement.style.transform,
-			value = translate.replace(/translate.*\(/ig, '').replace(/\).*$/ig, '').replace(/px/ig, '').split(','),
-			info = {
-				containerX: containerOffset.left,
-				containerY: containerOffset.top,
-				containerW: container.clientWidth,
-				translateX: value[0] * 1,
-				translateY: value[1] * 1
-			};
+		if (!this.dragNode) return;
 		// 赋初值
 		this.prevX || (this.prevX = event.pageX);
 		this.prevY || (this.prevY = event.pageY);
 		// 计算位移
-		info.dx = event.pageX - this.prevX;
-		info.dy = event.pageY - this.prevY;
+		this.dx = event.pageX - this.prevX;
+		this.dy = event.pageY - this.prevY;
 		// 保存当前坐标变成上一次的坐标
 		this.prevX = event.pageX;
 		this.prevY = event.pageY;
 		// 转换坐标
-		info.eventX = event.pageX - info.containerX;
-		info.eventY = event.pageY - info.containerY;
+		this.pageX = event.pageX;
+		this.pageY = event.pageY;
 		// 判断是不是放大缩小
 		if (this.isResize) {
-			this.resize(event, opt, info, flowgrid);
+			this.resize(this.flowgrid);
 		} else {
-			// 计算偏移
-			this.eventOffsetX || (this.eventOffsetX = info.eventX - info.translateX);
-			this.eventOffsetY || (this.eventOffsetY = info.eventY - info.translateY);
-			this.changeLocation(event, opt, info, flowgrid);
+			this.position(this.flowgrid);
 		}
 	},
-	changeLocation: function (event, opt, info, flowgrid) {
-		var node = this.dragNode.node,
-			x = info.eventX - this.eventOffsetX,
-			y = info.eventY - this.eventOffsetY;
-		// 计算坐标
+	position: function (flowgrid) {
+		var	x = this.pageX - this.containerX - this.offsetX;
+		var y = this.pageY - this.containerY - this.offsetY;
+		// 计算拖拽节点的坐标
 		this.dragElement.style.cssText += ';transform: translate(' + x + 'px,' + y + 'px);';
+		// 极值判断
+		flowgrid.checkIndexIsOutOf(node, this.isResize);
+		// debugger;
 		// 当前拖拽节点的坐标, 转换成对齐网格的坐标
-		var nodeX = Math.round(x / opt.cellW_Int);
-		var nodeY = Math.round(y / opt.cellH_Int);
+		var node = this.dragNode.node;
+		var nodeX = Math.round(x / flowgrid.opt.cellW_Int);
+		var nodeY = Math.round(y / flowgrid.opt.cellH_Int);
 		// 判断坐标是否变化
 		if (node.x !== nodeX || node.y !== nodeY) {
-			flowgrid.replaceNodeInArea(flowgrid.area, node);
 			node.x = nodeX;
 			node.y = nodeY;
-			flowgrid.checkIndexIsOutOf(flowgrid.area, node, this.isResize);
-			flowgrid.overlap(flowgrid.data, node, info.dx, info.dy, this.isResize);
-			flowgrid.load();
+			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
 		}
 	},
-	resize: function (event, opt, info, flowgrid) {
+	resize: function (flowgrid) {
 		var node = this.dragNode.node,
 			minW = node.minW * opt.cellW_Int - opt.padding.left - opt.padding.right,
 			minH = node.minH * opt.cellH_Int - opt.padding.top - opt.padding.bottom,
@@ -108,42 +94,44 @@ let dragdrop = {
 		// 判断最大宽
 		if (eventW + info.translateX > info.containerW)
 			w = info.containerW - info.translateX + opt.overflow;
-		// 设置宽高
+		// 计算拖拽节点的宽高
 		this.dragElement.style.cssText += ';width: ' + w + 'px; height: ' + h + 'px;';
 		// 判断宽高是否变化
-		var nodeW = Math.ceil(w / opt.cellW_Int),
-			nodeH = Math.ceil(h / opt.cellH_Int);
+		var nodeW = Math.ceil(w / opt.cellW_Int);
+		var nodeH = Math.ceil(h / opt.cellH_Int);
 		if (node.w !== nodeW || node.h !== nodeH) {
-			flowgrid.replaceNodeInArea(flowgrid.area, node);
 			node.w = nodeW;
 			node.h = nodeH;
-			flowgrid.checkIndexIsOutOf(flowgrid.area, node, this.isResize);
-			flowgrid.overlap(flowgrid.data, node, info.dx, info.dy, this.isResize);
-			flowgrid.load();
+			flowgrid.checkIndexIsOutOf(node, this.isResize);
+			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
 		}
 	},
 	dragEnd: function (event) {
-		if (!this.dragNode.node) return;
-		var flowgrid = this.flowgrid,
-			node = this.dragNode.node;
-		node.id = this.dragNode.id;
-		// 替换占位符
-		view.update(flowgrid, flowgrid.elements[node.id], node);
-		// 清理临时样式(结束拖拽)
-		this.dragElement.className = CONSTANT.FG_ITEM + ' ' + CONSTANT.FG_ITEM_ANIMATE;
-		// 清理临时变量
-		this.flowgrid = null;
+		if (!this.dragNode) return;
+		// 清空拖拽节点样式和内容
+		this.dragElement.removeAttribute('style');
+		this.dragElement.innerHTML = '';
+		// 隐藏拖拽节点
+		this.flowgrid.isDrag = false;
+		// 取消占位符样式
+		this.dragNode.placeholder = false;
+		// 临时变量
+		delete this.container;
+		delete this.flowgrid;
+		delete this.dragNode;
+		delete this.dragElement;
 		this.isResize = false;
-		this.dragNode.id = undefined;
-		this.dragNode.node = null;
-		// 清理临时坐标
-		this.prevX = undefined;
-		this.prevY = undefined;
-		this.eventOffsetX = undefined;
-		this.eventOffsetY = undefined;
-		// 移除临时dom(占位符)
-		view.remove(CONSTANT.PLACEHOLDER);
-		delete flowgrid.elements[CONSTANT.PLACEHOLDER];
+		// 删除偏移量
+		delete this.dx;
+		delete this.dy;
+		delete this.prevX;
+		delete this.prevY;
+		delete this.pageX;
+		delete this.pageY;
+		delete this.offsetX;
+		delete this.offsetY;
+		delete this.containerX;
+		delete this.containerY;
 	}
 }
 

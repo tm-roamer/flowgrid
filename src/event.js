@@ -1,4 +1,4 @@
-import {CONSTANT, globalConfig} from './config'
+import {globalConfig} from './config'
 import utils from './utils'
 import dragdrop from './dragdrop'
 
@@ -30,9 +30,9 @@ let handleEvent = {
 	mouseDown: function (event) {
 		let self = handleEvent;
 		// 设置拖拽过程中禁用文本选中
-		document.body.classList.add(CONSTANT.USER_SELECT_NONE);
+		document.body.classList.add('fg-user-select-none');
 		// 是否点击了拖拽节点
-		let ele = self.ele = utils.searchUp(event.target, CONSTANT.FG_ITEM);
+		let ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
@@ -54,7 +54,7 @@ let handleEvent = {
 		utils.throttle(new Date().getTime()) && dragdrop.drag(event);
 	},
 	mouseUp: function (event) {
-		document.body.classList.remove(CONSTANT.USER_SELECT_NONE);
+		document.body.classList.remove('fg-user-select-none');
 		dragdrop.dragEnd(event);
 		// 清理临时变量
 		let self = handleEvent;

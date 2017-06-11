@@ -8,24 +8,7 @@ var version = "1.2.1";
 
 // 常量
 var CONSTANT = {
-	THROTTLE_TIME: 15, // 节流函数的间隔时间单位ms, FPS = 1000 / THROTTLE_TIME
-	USER_SELECT_NONE: 'fg-user-select-none', // 绑定到body, 阻止拖拽过程中文本选中
-	FG_CONTAINER: 'fg-container', // 拖拽容器classname
-	FG_LAYOUT: 'fg-layout', // 拖拽容器的布局区classname
-	FG_LAYOUT_DRAGGABLE: 'data-fg-draggable', // 布局区拖拽属性
-	FG_LAYOUT_RESIZABLE: 'data-fg-resizable', // 布局区缩放属性
-	FG_LAYOUT_INDEX: 'data-fg-index', // 布局区编号
-	FG_ITEM: 'fg-item', // 拖拽块classname
-	FG_ITEM_ANIMATE: 'fg-item-animate', // 拖拽块classname 动画效果
-	FG_ITEM_CONTENT: 'fg-item-content', // 拖拽块的展示内容区div的classname
-	FG_ITEM_ZOOM_BAR: 'fg-zoom-bar', // 拖拽块内部放大缩小div的classname
-	FG_ITEM_ZOOM_BAR_ICO: 'fg-zoom-bar-ico', // 拖拽块内部放大缩小div里面图标的classname
-	FG_ITEM_DRAG_BAR: 'fg-drag-bar', // 拖拽块可以进行拖拽div的classname
-	FG_ITEM_DRAG_BAR_ICO: 'fg-drag-bar-ico', // 拖拽块可以进行拖拽div里面图标的classname
-	FG_ITEM_GRAG_DROP: 'fg-item-dragdrop', // 正在拖拽的块classname
-	FG_ITEM_PLACEHOLDER: 'fg-item-placeholder', // 拖拽块的占位符
-	FG_ITEM_DATA_ID: 'data-fg-id', // 拖拽块的数据标识id
-	PLACEHOLDER: 'placeholder' // 占位符
+	THROTTLE_TIME: 15 // 节流函数的间隔时间单位ms, FPS = 1000 / THROTTLE_TIME
 
 
 	// 全局配置
@@ -57,7 +40,7 @@ var CONSTANT = {
 };
 
 // 缓存对象
-var cache$1 = {
+var cache = {
 	init: function init() {
 		if (!this.arr) this.arr = [];
 	},
@@ -103,93 +86,80 @@ var utils = {
 
 var dragdrop = {
 	isResize: false, // 是否放大缩小
-	dragNode: { // 拖拽节点的的关联数据
-		id: undefined, // 拖拽节点的id
-		node: null // 占位符节点的关联数据
-	},
-	dragElement: null, // 拖拽的dom节点
+	dragNode: null, // 拖拽节点的的关联数据
+	dragElement: null, // 拖拽节点dom
 	dragStart: function dragStart(event, offsetX, offsetY, ele) {
-		var classList = event.target.classList;
-		// 取得网格对象
-		var flowgrid = this.flowgrid = cache.get(node);
-		// 配置项, 禁用拖拽
-		if (!flowgrid.opt.draggable) return;
-		// 判断是否放大缩小
-		if (classList.contains(CONSTANT.FG_ITEM_ZOOM_BAR)) {
+		// 判断是否点击了放大缩小
+		if (event.target.classList.contains('fg-item-zoom-bar')) {
 			this.isResize = true;
 		}
-		this.dragElement = node;
-		// 取得当前拖拽节点, 并替换当前拖拽节点id
-		var query = flowgrid.query(node.getAttribute(CONSTANT.FG_ITEM_DATA_ID));
-		if (query) {
-			this.dragElement.className = CONSTANT.FG_ITEM + ' ' + CONSTANT.FG_ITEM_GRAG_DROP;
-			this.dragNode.id = query.node.id;
-			this.dragNode.node = query.node;
-			this.dragNode.node.id = CONSTANT.PLACEHOLDER;
-			// 新增占位符
-			var element = flowgrid.elements[this.dragNode.node.id] = view.create(flowgrid, this.dragNode.node);
-			flowgrid.opt.container.appendChild(element);
-		}
+		// 取得vue网格对象 flowgrid === fg-container.vue
+		var container = this.container = utils.searchUp(ele, 'fg-layout');
+		var flowgrid = this.flowgrid = cache.get(container.getAttribute('index'));
+		// 配置项, 禁用拖拽
+		if (!flowgrid.opt.draggable) return;
+		// 取得当前vue被拖拽节点
+		var item = flowgrid.$children[ele.getAttribute('index') * 1];
+		// 留存备份一份 this.dragNode === fg-item.vue
+		this.dragNode = item;
+		// 将当前vue节点变成占位符, 控制样式
+		item.placeholder = true;
+		// 显示拖拽节点
+		flowgrid.isDrag = true;
+		// 将当前dom节点的内容区复制一份到拖拽节点
+		var dragElement = this.dragElement = container.querySelector('.fg-item-dragdrop');
+		dragElement.setAttribute("style", ele.getAttribute("style"));
+		dragElement.appendChild(ele.querySelector('.fg-item-content').cloneNode(true));
+		// 计算偏移量, 点击节点时: 点击位置与节点的左上角定点的偏移距离
+		var targetOffset = event.target.getBoundingClientRect();
+		var eleOffset = ele.getBoundingClientRect();
+		var containerOffset = container.getBoundingClientRect();
+		this.offsetX = targetOffset.left - eleOffset.left + offsetX || 0;
+		this.offsetY = targetOffset.top - eleOffset.top + offsetY || 0;
+		this.containerX = containerOffset.left;
+		this.containerY = containerOffset.top;
 	},
 	drag: function drag(event) {
-		if (!this.dragNode.node) return;
-		var flowgrid = this.flowgrid,
-		    opt = flowgrid.opt,
-		    container = opt.container,
-		    containerOffset = view.getOffset(container),
-		    // 取得容器偏移
-		// 相对父元素的偏移坐标x,y
-		translate = this.dragElement.style.transform,
-		    value = translate.replace(/translate.*\(/ig, '').replace(/\).*$/ig, '').replace(/px/ig, '').split(','),
-		    info = {
-			containerX: containerOffset.left,
-			containerY: containerOffset.top,
-			containerW: container.clientWidth,
-			translateX: value[0] * 1,
-			translateY: value[1] * 1
-		};
+		if (!this.dragNode) return;
 		// 赋初值
 		this.prevX || (this.prevX = event.pageX);
 		this.prevY || (this.prevY = event.pageY);
 		// 计算位移
-		info.dx = event.pageX - this.prevX;
-		info.dy = event.pageY - this.prevY;
+		this.dx = event.pageX - this.prevX;
+		this.dy = event.pageY - this.prevY;
 		// 保存当前坐标变成上一次的坐标
 		this.prevX = event.pageX;
 		this.prevY = event.pageY;
 		// 转换坐标
-		info.eventX = event.pageX - info.containerX;
-		info.eventY = event.pageY - info.containerY;
+		this.pageX = event.pageX;
+		this.pageY = event.pageY;
 		// 判断是不是放大缩小
 		if (this.isResize) {
-			this.resize(event, opt, info, flowgrid);
+			this.resize(this.flowgrid);
 		} else {
-			// 计算偏移
-			this.eventOffsetX || (this.eventOffsetX = info.eventX - info.translateX);
-			this.eventOffsetY || (this.eventOffsetY = info.eventY - info.translateY);
-			this.changeLocation(event, opt, info, flowgrid);
+			this.position(this.flowgrid);
 		}
 	},
-	changeLocation: function changeLocation(event, opt, info, flowgrid) {
-		var node = this.dragNode.node,
-		    x = info.eventX - this.eventOffsetX,
-		    y = info.eventY - this.eventOffsetY;
-		// 计算坐标
+	position: function position(flowgrid) {
+		var x = this.pageX - this.containerX - this.offsetX;
+		var y = this.pageY - this.containerY - this.offsetY;
+		// 计算拖拽节点的坐标
 		this.dragElement.style.cssText += ';transform: translate(' + x + 'px,' + y + 'px);';
+		// 极值判断
+		flowgrid.checkIndexIsOutOf(node, this.isResize);
+		// debugger;
 		// 当前拖拽节点的坐标, 转换成对齐网格的坐标
-		var nodeX = Math.round(x / opt.cellW_Int);
-		var nodeY = Math.round(y / opt.cellH_Int);
+		var node = this.dragNode.node;
+		var nodeX = Math.round(x / flowgrid.opt.cellW_Int);
+		var nodeY = Math.round(y / flowgrid.opt.cellH_Int);
 		// 判断坐标是否变化
 		if (node.x !== nodeX || node.y !== nodeY) {
-			flowgrid.replaceNodeInArea(flowgrid.area, node);
 			node.x = nodeX;
 			node.y = nodeY;
-			flowgrid.checkIndexIsOutOf(flowgrid.area, node, this.isResize);
-			flowgrid.overlap(flowgrid.data, node, info.dx, info.dy, this.isResize);
-			flowgrid.load();
+			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
 		}
 	},
-	resize: function resize(event, opt, info, flowgrid) {
+	resize: function resize(flowgrid) {
 		var node = this.dragNode.node,
 		    minW = node.minW * opt.cellW_Int - opt.padding.left - opt.padding.right,
 		    minH = node.minH * opt.cellH_Int - opt.padding.top - opt.padding.bottom,
@@ -203,42 +173,44 @@ var dragdrop = {
 		if (eventH < minH) h = minH - opt.overflow;
 		// 判断最大宽
 		if (eventW + info.translateX > info.containerW) w = info.containerW - info.translateX + opt.overflow;
-		// 设置宽高
+		// 计算拖拽节点的宽高
 		this.dragElement.style.cssText += ';width: ' + w + 'px; height: ' + h + 'px;';
 		// 判断宽高是否变化
-		var nodeW = Math.ceil(w / opt.cellW_Int),
-		    nodeH = Math.ceil(h / opt.cellH_Int);
+		var nodeW = Math.ceil(w / opt.cellW_Int);
+		var nodeH = Math.ceil(h / opt.cellH_Int);
 		if (node.w !== nodeW || node.h !== nodeH) {
-			flowgrid.replaceNodeInArea(flowgrid.area, node);
 			node.w = nodeW;
 			node.h = nodeH;
-			flowgrid.checkIndexIsOutOf(flowgrid.area, node, this.isResize);
-			flowgrid.overlap(flowgrid.data, node, info.dx, info.dy, this.isResize);
-			flowgrid.load();
+			flowgrid.checkIndexIsOutOf(node, this.isResize);
+			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
 		}
 	},
 	dragEnd: function dragEnd(event) {
-		if (!this.dragNode.node) return;
-		var flowgrid = this.flowgrid,
-		    node = this.dragNode.node;
-		node.id = this.dragNode.id;
-		// 替换占位符
-		view.update(flowgrid, flowgrid.elements[node.id], node);
-		// 清理临时样式(结束拖拽)
-		this.dragElement.className = CONSTANT.FG_ITEM + ' ' + CONSTANT.FG_ITEM_ANIMATE;
-		// 清理临时变量
-		this.flowgrid = null;
+		if (!this.dragNode) return;
+		// 清空拖拽节点样式和内容
+		this.dragElement.removeAttribute('style');
+		this.dragElement.innerHTML = '';
+		// 隐藏拖拽节点
+		this.flowgrid.isDrag = false;
+		// 取消占位符样式
+		this.dragNode.placeholder = false;
+		// 临时变量
+		delete this.container;
+		delete this.flowgrid;
+		delete this.dragNode;
+		delete this.dragElement;
 		this.isResize = false;
-		this.dragNode.id = undefined;
-		this.dragNode.node = null;
-		// 清理临时坐标
-		this.prevX = undefined;
-		this.prevY = undefined;
-		this.eventOffsetX = undefined;
-		this.eventOffsetY = undefined;
-		// 移除临时dom(占位符)
-		view.remove(CONSTANT.PLACEHOLDER);
-		delete flowgrid.elements[CONSTANT.PLACEHOLDER];
+		// 删除偏移量
+		delete this.dx;
+		delete this.dy;
+		delete this.prevX;
+		delete this.prevY;
+		delete this.pageX;
+		delete this.pageY;
+		delete this.offsetX;
+		delete this.offsetY;
+		delete this.containerX;
+		delete this.containerY;
 	}
 };
 
@@ -269,9 +241,9 @@ var handleEvent = {
 	mouseDown: function mouseDown(event) {
 		var self = handleEvent;
 		// 设置拖拽过程中禁用文本选中
-		document.body.classList.add(CONSTANT.USER_SELECT_NONE);
+		document.body.classList.add('fg-user-select-none');
 		// 是否点击了拖拽节点
-		var ele = self.ele = utils.searchUp(event.target, CONSTANT.FG_ITEM);
+		var ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
@@ -293,7 +265,7 @@ var handleEvent = {
 		utils.throttle(new Date().getTime()) && dragdrop.drag(event);
 	},
 	mouseUp: function mouseUp(event) {
-		document.body.classList.remove(CONSTANT.USER_SELECT_NONE);
+		document.body.classList.remove('fg-user-select-none');
 		dragdrop.dragEnd(event);
 		// 清理临时变量
 		var self = handleEvent;
@@ -323,7 +295,7 @@ var handleEvent = {
 
 var fgContainer = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "fg-container", class: { 'fg-no-draggable': !_vm.opt.draggable, 'fg-no-resizable': !_vm.opt.resizable }, attrs: { "fg-index": _vm.index } }, [_c('div', { staticClass: "fg-layout" }, [_vm._t("default"), _vm._v(" "), _c('div', { staticClass: "fg-item-dragdrop" })], 2)]);
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "fg-container" }, [_c('div', { staticClass: "fg-layout", class: { 'fg-no-draggable': !_vm.opt.draggable, 'fg-no-resizable': !_vm.opt.resizable }, attrs: { "index": _vm.index } }, [_vm._t("default"), _vm._v(" "), _c('div', { directives: [{ name: "show", rawName: "v-show", value: _vm.isDrag, expression: "isDrag" }], staticClass: "fg-item-dragdrop" })], 2)]);
   },
   staticRenderFns: [],
   name: 'fg-container',
@@ -338,7 +310,8 @@ var fgContainer = {
   data: function data() {
     return {
       area: [],
-      index: 1
+      index: 1,
+      isDrag: false
     };
   },
 
@@ -351,11 +324,13 @@ var fgContainer = {
       opt.cellH_Int = Math.floor(opt.cellH);
     },
     init: function init() {
-      // 初始化监听
       handleEvent.init(true);
       // 缓存对象
-      cache$1.init();
-      this.index = cache$1.set(this);
+      cache.init();
+      this.index = cache.set(this);
+      this.load();
+    },
+    load: function load() {
       // 初始矩阵区域并布局
       this.buildArea();
       this.layout();
@@ -466,7 +441,7 @@ var fgContainer = {
       node.y = r;
       return node;
     },
-    // 碰撞检测, 从左到右, 从上到下
+    // 碰撞检测, 从左到右, 从上到下扫描
     collision: function collision(area, node) {
       for (var r = node.y; r < node.y + node.h; r++) {
         for (var c = node.x; c < node.x + node.w; c++) {
@@ -528,6 +503,150 @@ var fgContainer = {
           this.area[r][c] = node.id;
         }
       }
+    },
+    // 调整大小
+    resize: function resize(containerW, containerH) {
+      this.opt.containerW = containerW;
+      this.computeCell(this.opt);
+      this.load();
+    },
+    // 检测脏数据
+    checkIndexIsOutOf: function checkIndexIsOutOf(node, isResize) {
+      var area = this.area,
+          col = area[0] && area[0].length || this.opt.col;
+      // 数组下标越界检查
+      node.x < 0 && (node.x = 0);
+      node.y < 0 && (node.y = 0);
+      if (isResize) {
+        node.x + node.w > col && (node.w = col - node.x);
+      } else {
+        node.x + node.w > col && (node.x = col - node.w);
+      }
+    },
+    // 碰撞检测, 两个矩形是否发生碰撞
+    checkHit: function checkHit(n, node) {
+      var result = false;
+      if (n.x + n.w > node.x && n.x < node.x + node.w) {
+        if (n.y + n.h > node.y && n.y < node.y + node.h) {
+          result = true;
+        }
+      }
+      return result;
+    },
+    // 节点重叠, 拖拽节点过程中, 将所有节点坐标重新计算
+    overlap: function overlap(node, dx, dy, isResize) {
+      var nodes = this.nodes,
+          dx = dx || 0,
+          dy = dy || 0,
+          offsetNode = null,
+          offsetUnderY = 0,
+          offsetUpY = 0,
+          isResize = isResize || false,
+          checkHit = this.checkHit;
+      // 向下, 向左, 向右插入节点
+      if (!isResize) {
+        var _iteratorNormalCompletion4 = true;
+        var _didIteratorError4 = false;
+        var _iteratorError4 = undefined;
+
+        try {
+          for (var _iterator4 = nodes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+            var n = _step4.value;
+
+            if (n !== node && checkHit(n, node)) {
+              var val = n.y + n.h - node.y;
+              if (val > offsetUnderY) {
+                offsetUnderY = val;
+                offsetNode = n;
+              }
+            }
+          }
+        } catch (err) {
+          _didIteratorError4 = true;
+          _iteratorError4 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+              _iterator4.return();
+            }
+          } finally {
+            if (_didIteratorError4) {
+              throw _iteratorError4;
+            }
+          }
+        }
+
+        if (offsetNode) {
+          // 判断插入点应该上移还是下移, 通过重叠点的中间值h/2来判断
+          var median = offsetNode.h / 2 < 1 ? 1 : Math.floor(offsetNode.h / 2);
+          // 计算差值, 与中间值比较, dy > 2 下移(2是优化, 防止平移上下震动), 拿y+h来和中间值比较
+          var difference = dy >= 2 && dy >= dx ? node.y + node.h - offsetNode.y : node.y - offsetNode.y;
+          // 大于中间值, 求出下面那部分截断的偏移量, 等于是怕上下顺序连续的块,会错过互换位置
+          if (difference >= median) {
+            node.y = node.y + offsetUnderY;
+          }
+        }
+      }
+      // 向上插入节点
+      var _iteratorNormalCompletion5 = true;
+      var _didIteratorError5 = false;
+      var _iteratorError5 = undefined;
+
+      try {
+        for (var _iterator5 = nodes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+          var _n = _step5.value;
+
+          if (_n !== node && checkHit(_n, node)) {
+            var val = node.y - _n.y;
+            offsetUpY = val > offsetUpY ? val : offsetUpY;
+          }
+        }
+        // 重新计算y值
+      } catch (err) {
+        _didIteratorError5 = true;
+        _iteratorError5 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion5 && _iterator5.return) {
+            _iterator5.return();
+          }
+        } finally {
+          if (_didIteratorError5) {
+            throw _iteratorError5;
+          }
+        }
+      }
+
+      var _iteratorNormalCompletion6 = true;
+      var _didIteratorError6 = false;
+      var _iteratorError6 = undefined;
+
+      try {
+        for (var _iterator6 = nodes[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+          var _n2 = _step6.value;
+
+          if (_n2 !== node) {
+            if (_n2.y < node.y && node.y < _n2.y + _n2.h || node.y <= _n2.y) {
+              _n2.y = _n2.y + node.h + offsetUpY;
+            }
+          }
+        }
+      } catch (err) {
+        _didIteratorError6 = true;
+        _iteratorError6 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion6 && _iterator6.return) {
+            _iterator6.return();
+          }
+        } finally {
+          if (_didIteratorError6) {
+            throw _iteratorError6;
+          }
+        }
+      }
+
+      return this;
     }
   },
   created: function created() {
@@ -535,17 +654,11 @@ var fgContainer = {
     this.init();
   },
   beforeUpdate: function beforeUpdate() {
-    // 数据更新时重置区域, 并布局
-    this.buildArea();
-    this.layout();
-    //console.log(this);
+    // 数据即将更新时重置区域, 并应用布局
+    this.load();
   },
-  updated: function updated() {
-    //console.log(this);
-  },
-  mounted: function mounted() {
-    //console.log('mounted');
-  },
+  updated: function updated() {},
+  mounted: function mounted() {},
   destroyed: function destroyed() {
     handleEvent.destroy();
   }
@@ -553,7 +666,7 @@ var fgContainer = {
 
 var fgItem = {
   render: function render() {
-    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "fg-item", style: _vm.itemStyle, attrs: { "fg-id": _vm.node.id } }, [_c('div', { staticClass: "fg-item-content" }, [_vm._t("default")], 2), _vm._v(" "), _c('div', { staticClass: "fg-item-zoom-bar", attrs: { "fg-id": _vm.node.id } })]);
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "fg-item fg-item-animate", class: { 'fg-item-placeholder': _vm.placeholder }, style: _vm.itemStyle, attrs: { "fg-id": _vm.node.id, "index": _vm.index } }, [_c('div', { staticClass: "fg-item-content" }, [_vm._t("default")], 2), _vm._v(" "), _c('div', { staticClass: "fg-item-zoom-bar", attrs: { "fg-id": _vm.node.id, "index": _vm.index } })]);
   },
   staticRenderFns: [],
   name: 'fg-item',
@@ -571,12 +684,11 @@ var fgItem = {
     }
   },
   data: function data() {
-    return {};
+    return {
+      placeholder: false
+    };
   },
-  mounted: function mounted() {
-    // console.log(this.$parent.options);
-    //       console.log('2222');
-  }
+  mounted: function mounted() {}
 };
 
 var index = {

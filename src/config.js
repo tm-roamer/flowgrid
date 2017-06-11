@@ -1,24 +1,7 @@
 
 // 常量
 export const CONSTANT = {
-	THROTTLE_TIME: 15,                              // 节流函数的间隔时间单位ms, FPS = 1000 / THROTTLE_TIME
-	USER_SELECT_NONE: 'fg-user-select-none',			  // 绑定到body, 阻止拖拽过程中文本选中
-	FG_CONTAINER: 'fg-container',                   // 拖拽容器classname
-	FG_LAYOUT: 'fg-layout',                         // 拖拽容器的布局区classname
-	FG_LAYOUT_DRAGGABLE: 'data-fg-draggable',       // 布局区拖拽属性
-	FG_LAYOUT_RESIZABLE: 'data-fg-resizable',       // 布局区缩放属性
-	FG_LAYOUT_INDEX: 'data-fg-index',               // 布局区编号
-	FG_ITEM: 'fg-item',                             // 拖拽块classname
-	FG_ITEM_ANIMATE: 'fg-item-animate',             // 拖拽块classname 动画效果
-	FG_ITEM_CONTENT: 'fg-item-content',             // 拖拽块的展示内容区div的classname
-	FG_ITEM_ZOOM_BAR: 'fg-zoom-bar',                // 拖拽块内部放大缩小div的classname
-	FG_ITEM_ZOOM_BAR_ICO: 'fg-zoom-bar-ico',        // 拖拽块内部放大缩小div里面图标的classname
-	FG_ITEM_DRAG_BAR: 'fg-drag-bar',                // 拖拽块可以进行拖拽div的classname
-	FG_ITEM_DRAG_BAR_ICO: 'fg-drag-bar-ico',        // 拖拽块可以进行拖拽div里面图标的classname
-	FG_ITEM_GRAG_DROP: 'fg-item-dragdrop',          // 正在拖拽的块classname
-	FG_ITEM_PLACEHOLDER: 'fg-item-placeholder',     // 拖拽块的占位符
-	FG_ITEM_DATA_ID: 'data-fg-id',                  // 拖拽块的数据标识id
-	PLACEHOLDER: 'placeholder'                      // 占位符
+	THROTTLE_TIME: 15                              	  // 节流函数的间隔时间单位ms, FPS = 1000 / THROTTLE_TIME
 }
 
 // 全局配置

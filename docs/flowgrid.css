@@ -31,6 +31,7 @@ body.fg-user-select-none {
   }
 }
 
+/* 插件外容器的样式 */
 .fg-container {
   position: relative;
   z-index: 1;
@@ -39,6 +40,7 @@ body.fg-user-select-none {
   overflow: auto;
 }
 
+/* 网络布局的外容器 */
 .fg-layout {
   position: absolute;
   top: 0;
@@ -47,24 +49,58 @@ body.fg-user-select-none {
   bottom: 0;
 }
 
+/* 当禁止缩放, 隐藏缩放句柄 */
 .fg-layout.fg-no-resizable .fg-item-zoom-bar {
   display: none;
 }
 
+/* 当禁用缩放或者拖拽, 恢复鼠标形状 */
 .fg-layout.fg-no-draggable .fg-item,
 .fg-layout.fg-no-resizable .fg-item {
   cursor: default;
 }
 
+/* 节点块的样式 */
 .fg-item {
   cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
   position: absolute;
   z-index: 10;
   background-color: #8fee2b;
 }
 
+/* 节点块的动画样式 */
+.fg-item-animate {
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.2s, height 0.2s, width 0.2s;
+}
+
+/* 拖拽过程中, 被拖拽的当前节点块补充占位样式 */
+.fg-item-placeholder {
+  z-index: 1;
+}
+.fg-item-placeholder::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #d3d3d3;
+  z-index: 1;
+}
+
+/* 拖拽过程中, 被拖拽的节点 */
+.fg-item-dragdrop {
+  position: absolute;
+  z-index: 100;
+  box-shadow: 2px 2px 2px rgba(144, 142, 142, 0.6);
+  opacity: 0.8;
+  background-color: #8fee2b;
+}
+
+ /* 节点块的内容区 */
 .fg-item-content {
   position: absolute;
   top: 0;
@@ -73,6 +109,7 @@ body.fg-user-select-none {
   bottom: 0;
 }
 
+/* 节点块的缩放句柄 */
 .fg-item-zoom-bar {
   position: absolute;
   bottom: 0;
@@ -80,35 +117,17 @@ body.fg-user-select-none {
   height: 24px;
   width: 24px;
   overflow: hidden;
-  z-index: 2147483647;
+  z-index: 1;
   cursor: se-resize;
 }
-
 .fg-item-zoom-bar:before {
   content: "";
   position: absolute;
-  z-index: 2147483647;
+  z-index: 100;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
 }
 
-.fg-item-dragdrop {
-  box-shadow: 2px 2px 2px rgba(144, 142, 142, 0.6);
-  opacity: 0.8;
-  z-index: 2147483647;
-}
-
-.fg-item[data-fg-id="placeholder"] {
-  background-color: #d3d3d3;
-  z-index: 1;
-}
-
-.fg-item-animate {
-  -webkit-transform: translate3d(0, 0, 0);
-  -webkit-backface-visibility: hidden;
-  -webkit-transform-style: preserve-3d;
-  transition: transform 0.2s, height 0.2s, width 0.2s;
-}
 

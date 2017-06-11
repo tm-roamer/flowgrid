@@ -1,15 +1,17 @@
 <template>
-  <div class="fg-item" :style="itemStyle" :fg-id="node.id">
+  <div class="fg-item fg-item-animate"
+       :class="{'fg-item-placeholder': placeholder}"
+       :style="itemStyle"
+       :fg-id="node.id"
+       :index="index">
     <div class="fg-item-content">
       <slot></slot>
     </div>
-    <div class="fg-item-zoom-bar" :fg-id="node.id"></div>
+    <div class="fg-item-zoom-bar" :fg-id="node.id" :index="index"></div>
   </div>
 </template>
 
 <script>
-
-  import {CONSTANT} from './config'
 
   export default {
     name: 'fg-item',
@@ -30,12 +32,10 @@
     },
     data () {
       return {
+        placeholder: false
       }
     },
-    mounted () {
-      // console.log(this.$parent.options);
-//       console.log('2222');
-    }
+    mounted () {}
   }
 </script>
 
