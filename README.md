@@ -12,7 +12,7 @@ flowgrid是vue插件, 使用 babel + rollup + uglifyjs 来进行源码构建.
 
 ### npm
 
-
+[flowgrid的npm地址](https://www.npmjs.com/package/flowgrid). https://www.npmjs.com/package/flowgrid
 
 ### 参考图
 
@@ -20,6 +20,9 @@ flowgrid是vue插件, 使用 babel + rollup + uglifyjs 来进行源码构建.
 
 ### 使用方式
 
+1. /docs/flowgrid.min.js npm install安装后可以直接import使用
+
+2. /src/源码 直接copy到项目工程进行使用, 方便定制
 
 ### 源码说明
 
@@ -34,12 +37,10 @@ flowgrid是vue插件, 使用 babel + rollup + uglifyjs 来进行源码构建.
         minH: 2   // 最小高度
       }
 
-### API使用示例
-
-### flowgrid对象的属性和方法
-
 ### 更新日志
 
+v1.2.2
+  1. 完善readme文档
 v1.2.1
   1. 使用vue来构建源码, 蹭蹭热度, 支持以vue的方式来使用.
   2. 优化了部分代码, 补充注释.
