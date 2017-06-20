@@ -43,6 +43,11 @@ npm地址: https://www.npmjs.com/package/flowgrid
 
 ### 更新日志
 
+v2.0.2
+  1. 补充回调函数dragStart, drag, dragEnd
+  2. 补充回调函数resizeStart, resize, resizeEnd
+  3. 修复拖拽过程中body文本选中bug
+
 v1.2.2
   1. 完善readme文档
 
