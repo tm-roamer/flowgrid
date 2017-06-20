@@ -64,7 +64,8 @@ body.fg-user-select-none {
   cursor: pointer;
   position: absolute;
   z-index: 10;
-  background-color: #8fee2b;
+  background-color: rgb(19, 19, 19);
+  color:rgba(255,255,255,0.7);
 }
 
 /* 节点块的动画样式 */
@@ -86,7 +87,7 @@ body.fg-user-select-none {
   left: 0;
   right: 0;
   bottom: 0;
-  background: #d3d3d3;
+  background:rgba(64, 108, 176, 0.3);
   z-index: 2;
 }
 
@@ -96,10 +97,10 @@ body.fg-user-select-none {
   z-index: 100;
   box-shadow: 2px 2px 2px rgba(144, 142, 142, 0.6);
   opacity: 0.8;
-  background-color: #8fee2b;
+  background-color: rgb(19, 19, 19);
 }
 
- /* 节点块的内容区 */
+/* 节点块的内容区 */
 .fg-item-content {
   position: absolute;
   top: 0;
@@ -127,7 +128,7 @@ body.fg-user-select-none {
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: aqua;
+  background-color: #20a0ff;
 }
 
 

@@ -4,11 +4,12 @@
 	(global.flowgrid = factory());
 }(this, (function () { 'use strict';
 
-var version = "1.2.1";
+var version = "2.2.2";
 
 // 常量
 var CONSTANT = {
-	THROTTLE_TIME: 15 // 节流函数的间隔时间单位ms, FPS = 1000 / THROTTLE_TIME
+	THROTTLE_TIME: 15, // 节流函数的间隔时间, 单位ms, FPS = 1000 / THROTTLE_TIME
+	THROTTLE_LAZY_TIME: 100 // 节流函数的懒执行间隔时间, 单位ms
 
 
 	// 全局配置
@@ -76,6 +77,14 @@ var utils = {
 		};
 		this.throttle(now);
 	},
+	// 节流函数懒执行
+	throttleLazyId: 'throttleLazyId',
+	throttleLazy: function throttleLazy(ck) {
+		clearTimeout(this.throttleLazyId);
+		this.throttleLazyId = setTimeout(function () {
+			ck && typeof ck === 'function' && ck();
+		}, CONSTANT.THROTTLE_LAZY_TIME);
+	},
 	// 查找DOM节点
 	searchUp: function searchUp(ele, type) {
 		if (ele === document.body || ele === document) return undefined; // 向上递归到顶就停
@@ -117,13 +126,16 @@ var dragdrop = {
 			this.isResize = isResize;
 			this.offsetX = offsetX || 0;
 			this.offsetY = offsetY || 0;
+			// 执行回调
+			flowgrid.resizeStart(item);
 		} else {
 			var targetOffset = event.target.getBoundingClientRect();
 			var eleOffset = ele.getBoundingClientRect();
 			this.offsetX = targetOffset.left - eleOffset.left + offsetX || 0;
 			this.offsetY = targetOffset.top - eleOffset.top + offsetY || 0;
+			// 执行回调
+			flowgrid.dragStart(item);
 		}
-		console.log(event.target);
 	},
 	drag: function drag(event) {
 		if (!this.dragNode) return;
@@ -163,6 +175,8 @@ var dragdrop = {
 			node.x = nodeX;
 			node.y = nodeY;
 			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
+			// 执行回调
+			flowgrid.drag(this.dragNode);
 		}
 	},
 	resize: function resize() {
@@ -192,10 +206,18 @@ var dragdrop = {
 			node.w = nodeW;
 			node.h = nodeH;
 			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
+			// 执行回调
+			flowgrid.resize(this.dragNode);
 		}
 	},
 	dragEnd: function dragEnd(event) {
 		if (!this.dragNode) return;
+		// 执行回调
+		if (this.isResize) {
+			this.flowgrid.resizeEnd(this.dragNode);
+		} else {
+			this.flowgrid.dragEnd(this.dragNode);
+		}
 		// 清空拖拽节点样式和内容
 		this.dragElement.removeAttribute('style');
 		this.dragElement.innerHTML = '';
@@ -251,11 +273,12 @@ var handleEvent = {
 	},
 	mouseDown: function mouseDown(event) {
 		var self = handleEvent;
-		// 设置拖拽过程中禁用文本选中
-		document.body.classList.add('fg-user-select-none');
 		// 是否点击了拖拽节点
 		var ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
+			// 设置拖拽过程中禁用文本选中
+			document.body.classList.add('fg-user-select-none');
+			// 判断是否是缩放
 			if (event.target.classList.contains('fg-item-zoom-bar')) {
 				self.isResize = true;
 			}
@@ -519,12 +542,6 @@ var fgContainer = {
         }
       }
     },
-    // 调整大小
-    resize: function resize(containerW, containerH) {
-      this.opt.containerW = containerW;
-      this.computeCell(this.opt);
-      this.load();
-    },
     // 碰撞检测, 两个矩形是否发生碰撞
     checkHit: function checkHit(n, node) {
       var result = false;
@@ -649,6 +666,31 @@ var fgContainer = {
       }
 
       return this;
+    },
+
+    // 回调函数, 开始拖拽
+    dragStart: function dragStart(item) {
+      this.$emit('dragStart', this, item);
+    },
+    // 回调函数, 正在拖拽
+    drag: function drag(item) {
+      this.$emit('drag', this, item);
+    },
+    // 回调函数, 结束拖拽
+    dragEnd: function dragEnd(item) {
+      this.$emit('dragEnd', this, item);
+    },
+    // 回调函数, 开始缩放
+    resizeStart: function resizeStart(item) {
+      this.$emit('resizeStart', this, item);
+    },
+    // 回调函数, 正在拖拽
+    resize: function resize(item) {
+      this.$emit('resize', this, item);
+    },
+    // 回调函数, 结束缩放
+    resizeEnd: function resizeEnd(item) {
+      this.$emit('resizeEnd', this, item);
     }
   },
   created: function created() {
@@ -679,19 +721,22 @@ var fgItem = {
     itemStyle: function itemStyle() {
       var opt = this.$parent.opt;
       var node = this.node;
+      this.width = node.w * opt.cellW_Int - opt.padding.left - opt.padding.right;
+      this.height = node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom;
       return {
         transform: "translate(" + node.x * opt.cellW_Int + "px," + node.y * opt.cellH_Int + "px)",
-        width: node.w * opt.cellW_Int - opt.padding.left - opt.padding.right + 'px',
-        height: node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom + 'px'
+        width: this.width + 'px',
+        height: this.height + 'px'
       };
     }
   },
   data: function data() {
     return {
-      placeholder: false
+      placeholder: false,
+      width: 0,
+      height: 0
     };
-  },
-  mounted: function mounted() {}
+  }
 };
 
 var index = {

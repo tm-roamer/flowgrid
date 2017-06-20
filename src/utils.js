@@ -1,4 +1,3 @@
-
 import {CONSTANT} from './config'
 
 let utils = {
@@ -13,6 +12,14 @@ let utils = {
 			return false;
 		};
 		this.throttle(now);
+	},
+	// 节流函数懒执行
+	throttleLazyId: 'throttleLazyId',
+	throttleLazy: function (ck) {
+		clearTimeout(this.throttleLazyId);
+		this.throttleLazyId = setTimeout(function () {
+			ck && typeof ck === 'function' && ck();
+		}, CONSTANT.THROTTLE_LAZY_TIME);
 	},
 	// 查找DOM节点
 	searchUp: function (ele, type) {

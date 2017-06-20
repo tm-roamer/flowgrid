@@ -1,7 +1,8 @@
 
 // 常量
 export const CONSTANT = {
-	THROTTLE_TIME: 15                              	  // 节流函数的间隔时间单位ms, FPS = 1000 / THROTTLE_TIME
+	THROTTLE_TIME: 15,                             	  // 节流函数的间隔时间, 单位ms, FPS = 1000 / THROTTLE_TIME
+	THROTTLE_LAZY_TIME: 100														// 节流函数的懒执行间隔时间, 单位ms
 }
 
 // 全局配置

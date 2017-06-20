@@ -10,6 +10,7 @@
       padding: 0;
       height: 100%;
     }
+
     .btn-group {
       padding: 10px 0;
     }
@@ -22,8 +23,14 @@
     <a href="javascript:void(0);" @click="addNode">添加节点</a>
   </div>
   <fg-container :setting="setting"
-                :nodes="nodes">
-    <fg-item  v-for="(node, index) in nodes" :node="node" :index="index">
+                :nodes="nodes"
+                @dragStart="dragStart"
+                @drag="drag"
+                @dragEnd="dragEnd"
+                @resizeStart="resizeStart"
+                @resize="resize"
+                @resizeEnd="resizeEnd">
+    <fg-item v-for="(node, index) in nodes" :node="node" :index="index">
       <span>{{widget[index]}}</span>
     </fg-item>
   </fg-container>
@@ -57,14 +64,36 @@
       }
     },
     methods: {
-      addNode: function() {
+      addNode: function () {
         var container = this.$children[0];
         var id = this.nodes.length + '';
         var node = container.getNodeCoord({id: id, x: 0, y: 0, w: 3, h: 3, minW: 2, minH: 2});
         this.nodes.push(node);
+      },
+      dragStart: function (flowgrid, item) {
+        // 因方法名大小写问题无法触发, 项目中可以正常触发
+        // console.log(flowgrid, item, 'dragStart');
+      },
+      drag: function (flowgrid, item) {
+        console.log(flowgrid, item, 'drag');
+      },
+      dragEnd: function (flowgrid) {
+        // 因方法名大小写问题无法触发, 项目中可以正常触发
+        // console.log(flowgrid, 'dragEnd');
+      },
+      resizeStart: function (flowgrid, item) {
+        // 因方法名大小写问题无法触发, 项目中可以正常触发
+        // console.log(flowgrid, item, 'resizeStart');
+      },
+      resize: function (flowgrid, item) {
+        console.log(flowgrid, item, 'resize');
+      },
+      resizeEnd: function (flowgrid, item) {
+        // 因方法名大小写问题无法触发, 项目中可以正常触发
+        // console.log(flowgrid, item, 'resizeEnd');
       }
     },
-    mounted: function() {
+    mounted: function () {
       console.log(this);
     },
     components: {

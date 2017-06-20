@@ -23,19 +23,22 @@
       itemStyle: function () {
         let opt = this.$parent.opt;
         let node = this.node;
+        this.width = node.w * opt.cellW_Int - opt.padding.left - opt.padding.right;
+        this.height = node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom;
         return {
           transform: "translate(" + (node.x * opt.cellW_Int) + "px," + (node.y * opt.cellH_Int) + "px)",
-          width: (node.w * opt.cellW_Int - opt.padding.left - opt.padding.right) + 'px',
-          height: (node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom) + 'px'
+          width: this.width + 'px',
+          height: this.height + 'px'
         }
       }
     },
     data () {
       return {
-        placeholder: false
+        placeholder: false,
+        width: 0,
+        height: 0
       }
-    },
-    mounted () {}
+    }
   }
 </script>
 

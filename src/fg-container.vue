@@ -152,12 +152,6 @@
           for (let c = node.x; c < node.x + node.w; c++)
             this.area[r][c] = node.id;
       },
-      // 调整大小
-      resize: function (containerW, containerH) {
-        this.opt.containerW = containerW;
-        this.computeCell(this.opt);
-        this.load();
-      },
       // 碰撞检测, 两个矩形是否发生碰撞
       checkHit: function (n, node) {
         var result = false;
@@ -216,6 +210,31 @@
           }
         }
         return this;
+      },
+
+      // 回调函数, 开始拖拽
+      dragStart: function (item) {
+        this.$emit('dragStart', this, item);
+      },
+      // 回调函数, 正在拖拽
+      drag: function(item) {
+        this.$emit('drag', this, item);
+      },
+      // 回调函数, 结束拖拽
+      dragEnd: function (item) {
+        this.$emit('dragEnd', this, item);
+      },
+      // 回调函数, 开始缩放
+      resizeStart: function (item) {
+        this.$emit('resizeStart', this, item);
+      },
+      // 回调函数, 正在拖拽
+      resize: function(item) {
+        this.$emit('resize', this, item);
+      },
+      // 回调函数, 结束缩放
+      resizeEnd: function (item) {
+        this.$emit('resizeEnd', this, item);
       }
     },
     created () {
@@ -300,7 +319,8 @@
     cursor: pointer;
     position: absolute;
     z-index: 10;
-    background-color: #8fee2b;
+    background-color: rgb(19, 19, 19);
+    color:rgba(255,255,255,0.7);
   }
 
   /* 节点块的动画样式 */
@@ -322,7 +342,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: #d3d3d3;
+    background:rgba(64, 108, 176, 0.3);
     z-index: 2;
   }
 
@@ -332,10 +352,10 @@
     z-index: 100;
     box-shadow: 2px 2px 2px rgba(144, 142, 142, 0.6);
     opacity: 0.8;
-    background-color: #8fee2b;
+    background-color: rgb(19, 19, 19);
   }
 
-   /* 节点块的内容区 */
+  /* 节点块的内容区 */
   .fg-item-content {
     position: absolute;
     top: 0;
@@ -363,7 +383,7 @@
     left: 0;
     bottom: 0;
     right: 0;
-    background-color: aqua;
+    background-color: #20a0ff;
   }
 
 </style>

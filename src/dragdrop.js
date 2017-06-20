@@ -34,13 +34,16 @@ let dragdrop = {
 			this.isResize = isResize;
 			this.offsetX = offsetX || 0;
 			this.offsetY = offsetY || 0;
+			// 执行回调
+			flowgrid.resizeStart(item);
 		} else {
 			var targetOffset = event.target.getBoundingClientRect();
 			var eleOffset = ele.getBoundingClientRect();
 			this.offsetX = targetOffset.left - eleOffset.left + offsetX || 0;
 			this.offsetY = targetOffset.top - eleOffset.top + offsetY || 0;
+			// 执行回调
+			flowgrid.dragStart(item);
 		}
-		console.log(event.target);
 	},
 	drag: function (event) {
 		if (!this.dragNode) return;
@@ -80,6 +83,8 @@ let dragdrop = {
 			node.x = nodeX;
 			node.y = nodeY;
 			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
+			// 执行回调
+			flowgrid.drag(this.dragNode);
 		}
 	},
 	resize: function () {
@@ -109,10 +114,18 @@ let dragdrop = {
 			node.w = nodeW;
 			node.h = nodeH;
 			flowgrid.overlap(node, this.dx, this.dy, this.isResize);
+			// 执行回调
+			flowgrid.resize(this.dragNode);
 		}
 	},
 	dragEnd: function (event) {
 		if (!this.dragNode) return;
+		// 执行回调
+		if (this.isResize) {
+			this.flowgrid.resizeEnd(this.dragNode)
+		} else {
+			this.flowgrid.dragEnd(this.dragNode)
+		}
 		// 清空拖拽节点样式和内容
 		this.dragElement.removeAttribute('style');
 		this.dragElement.innerHTML = '';

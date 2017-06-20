@@ -29,11 +29,12 @@ let handleEvent = {
 	},
 	mouseDown: function (event) {
 		let self = handleEvent;
-		// 设置拖拽过程中禁用文本选中
-		document.body.classList.add('fg-user-select-none');
 		// 是否点击了拖拽节点
 		let ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
+			// 设置拖拽过程中禁用文本选中
+			document.body.classList.add('fg-user-select-none');
+			// 判断是否是缩放
 			if (event.target.classList.contains('fg-item-zoom-bar')) {
 				self.isResize = true;
 			}
