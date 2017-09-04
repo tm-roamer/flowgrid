@@ -48,17 +48,17 @@ let dragdrop = {
 	drag: function (event) {
 		if (!this.dragNode) return;
 		// 赋初值
-		this.prevX || (this.prevX = event.pageX);
-		this.prevY || (this.prevY = event.pageY);
+		this.prevX || (this.prevX = event.clientX);
+		this.prevY || (this.prevY = event.clientY);
 		// 计算位移
-		this.dx = event.pageX - this.prevX;
-		this.dy = event.pageY - this.prevY;
+		this.dx = event.clientX - this.prevX;
+		this.dy = event.clientY - this.prevY;
 		// 保存当前坐标变成上一次的坐标
-		this.prevX = event.pageX;
-		this.prevY = event.pageY;
+		this.prevX = event.clientX;
+		this.prevY = event.clientY;
 		// 转换坐标
-		this.pageX = event.pageX;
-		this.pageY = event.pageY;
+		this.pageX = event.clientX;
+		this.pageY = event.clientY;
 		// 判断是缩放还是拖拽
 		this.isResize ? this.resize() : this.position()
 	},
