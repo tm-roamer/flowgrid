@@ -45,7 +45,7 @@
         opt.cellH_Int = Math.floor(opt.cellH);
       },
       init: function () {
-        handleEvent.init(true);
+        handleEvent.init(true, this.opt);
         // 缓存对象
         cache.init();
         this.index = cache.set(this);

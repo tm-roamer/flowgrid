@@ -246,10 +246,13 @@ var dragdrop = {
 	}
 };
 
+//配置选项
+var configOption = void 0;
 // 事件处理对象
 var handleEvent = {
-	init: function init(isbind) {
+	init: function init(isbind, opt) {
 		if (this.isbind) return;
+		configOption = opt;
 		this.isbind = isbind;
 		this.unbindEvent();
 		this.bindEvent();
@@ -273,6 +276,8 @@ var handleEvent = {
 	},
 	mouseDown: function mouseDown(event) {
 		var self = handleEvent;
+		//判断按下的是否是鼠标左键(或者是否是设置的键)
+		if (!self.ifLeft(event)) return;
 		// 是否点击了拖拽节点
 		var ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
@@ -284,7 +289,7 @@ var handleEvent = {
 			}
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
-			self.distance = globalConfig.distance;
+			self.distance = configOption.distance;
 			self.distanceX = event.pageX;
 			self.distanceY = event.pageY;
 			self.offsetX = event.offsetX || 0;
@@ -293,6 +298,7 @@ var handleEvent = {
 	},
 	mouseMove: function mouseMove(event) {
 		var self = handleEvent;
+		if (!self.ifLeft(event)) return;
 		if (!self.ele) return;
 		if (self.dragStart && self.isDrag(event)) {
 			self.dragStart = false;
@@ -302,10 +308,13 @@ var handleEvent = {
 		utils.throttle(new Date().getTime()) && dragdrop.drag(event);
 	},
 	mouseUp: function mouseUp(event) {
-		document.body.classList.remove('fg-user-select-none');
-		dragdrop.dragEnd(event);
 		// 清理临时变量
 		var self = handleEvent;
+
+		if (!self.ifLeft(event)) return;
+		document.body.classList.remove('fg-user-select-none');
+		dragdrop.dragEnd(event);
+
 		delete self.distance;
 		delete self.distanceX;
 		delete self.distanceY;
@@ -316,7 +325,6 @@ var handleEvent = {
 	click: function click(event) {
 		var self = handleEvent;
 		if (self.dragStart === false) {
-			// event.preventDefault();
 			event.stopPropagation();
 			delete self.dragStart;
 		}
@@ -328,6 +336,10 @@ var handleEvent = {
 		if (self.distance < distanceX || self.distance < distanceY) {
 			return true;
 		}
+	},
+	//判断是否是按下了左键, 0为左键
+	ifLeft: function ifLeft(event) {
+		return event.button === 0;
 	}
 };
 
@@ -362,7 +374,7 @@ var fgContainer = {
       opt.cellH_Int = Math.floor(opt.cellH);
     },
     init: function init() {
-      handleEvent.init(true);
+      handleEvent.init(true, this.opt);
       // 缓存对象
       cache.init();
       this.index = cache.set(this);

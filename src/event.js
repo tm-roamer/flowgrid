@@ -1,11 +1,13 @@
-import {globalConfig} from './config'
 import utils from './utils'
 import dragdrop from './dragdrop'
 
+//配置选项
+let configOption;
 // 事件处理对象
 let handleEvent = {
-	init: function (isbind) {
+	init: function (isbind, opt) {
 		if (this.isbind) return;
+		configOption = opt;
 		this.isbind = isbind;
 		this.unbindEvent();
 		this.bindEvent();
@@ -42,7 +44,7 @@ let handleEvent = {
 			}
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
-			self.distance = globalConfig.distance;
+			self.distance = configOption.distance;
 			self.distanceX = event.pageX;
 			self.distanceY = event.pageY;
 			self.offsetX = event.offsetX || 0;
