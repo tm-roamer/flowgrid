@@ -29,6 +29,8 @@ let handleEvent = {
 	},
 	mouseDown: function (event) {
 		let self = handleEvent;
+		//判断按下的是否是鼠标左键(或者是否是设置的键)
+		if(!self.ifLeft(event))	return;
 		// 是否点击了拖拽节点
 		let ele = self.ele = utils.searchUp(event.target, 'fg-item');
 		if (ele) {
@@ -49,6 +51,7 @@ let handleEvent = {
 	},
 	mouseMove: function (event) {
 		let self = handleEvent;
+		if(!self.ifLeft(event))	return;
 		if (!self.ele) return;
 		if (self.dragStart && self.isDrag(event)) {
 			self.dragStart = false;
@@ -58,10 +61,13 @@ let handleEvent = {
 		utils.throttle(new Date().getTime()) && dragdrop.drag(event);
 	},
 	mouseUp: function (event) {
-		document.body.classList.remove('fg-user-select-none');
-		dragdrop.dragEnd(event);
 		// 清理临时变量
 		let self = handleEvent;
+
+		if(!self.ifLeft(event))	return;
+		document.body.classList.remove('fg-user-select-none');
+		dragdrop.dragEnd(event);
+
 		delete self.distance;
 		delete self.distanceX;
 		delete self.distanceY;
@@ -72,7 +78,6 @@ let handleEvent = {
 	click: function (event) {
 		let self = handleEvent;
 		if (self.dragStart === false) {
-			// event.preventDefault();
 			event.stopPropagation();
 			delete self.dragStart
 		}
@@ -84,6 +89,10 @@ let handleEvent = {
 		if (self.distance < distanceX || self.distance < distanceY) {
 			return true;
 		}
+	},
+	//判断是否是按下了左键, 0为左键
+	ifLeft: function (event) {
+		return event.button === 0;
 	}
 }
 
