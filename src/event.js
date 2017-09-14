@@ -45,8 +45,8 @@ let handleEvent = {
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
 			self.distance = configOption.distance;
-			self.distanceX = event.pageX;
-			self.distanceY = event.pageY;
+			self.distanceX = event.clientX;
+			self.distanceY = event.clientY;
 			self.offsetX = event.offsetX || 0;
 			self.offsetY = event.offsetY || 0;
 		}
@@ -86,8 +86,8 @@ let handleEvent = {
 	},
 	isDrag: function (event) {
 		var self = handleEvent,
-				distanceX = Math.abs(event.pageX - self.distanceX || 0),
-				distanceY = Math.abs(event.pageY - self.distanceY || 0);
+				distanceX = Math.abs(event.clientX - self.distanceX || 0),
+				distanceY = Math.abs(event.clientY - self.distanceY || 0);
 		if (self.distance < distanceX || self.distance < distanceY) {
 			return true;
 		}

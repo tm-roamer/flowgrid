@@ -10,8 +10,13 @@
       padding: 0;
       height: 100%;
     }
+
     .btn-group {
       padding: 10px 0;
+    }
+
+    .fg-container {
+      background: lightseagreen;
     }
   </style>
 </head>
@@ -22,8 +27,9 @@
     <a href="javascript:void(0);" @click="addNode">添加节点</a>
   </div>
   <fg-container :setting="setting"
-                :nodes="nodes">
-    <fg-item  v-for="(node, index) in nodes" :node="node" :index="index">
+                :nodes="nodes"
+                :style="{width: setting.containerW + 'px'}">
+    <fg-item v-for="(node, index) in nodes" :node="node" :index="index">
       <span>{{widget[index]}}</span>
     </fg-item>
   </fg-container>
@@ -38,7 +44,7 @@
     data: function () {
       return {
         setting: {
-          containerW: 1200      // @fix 这个必须指定
+          containerW: 1280      // @fix 这个必须指定
         },
         nodes: [
           {id: '1', x: 0, y: 0, w: 3, h: 2, minW: 2, minH: 2},
@@ -57,14 +63,14 @@
       }
     },
     methods: {
-      addNode: function() {
+      addNode: function () {
         var container = this.$children[0];
         var id = this.nodes.length + '';
         var node = container.getNodeCoord({id: id, x: 0, y: 0, w: 3, h: 3, minW: 2, minH: 2});
         this.nodes.push(node);
       }
     },
-    mounted: function() {
+    mounted: function () {
       console.log(this);
     },
     components: {

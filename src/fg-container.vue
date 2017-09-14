@@ -39,10 +39,9 @@
     methods: {
       // 计算单元格
       computeCell: function (opt) {
+        opt.containerW -= 2 * opt.padding.left;
         opt.cellW = opt.containerW / opt.col;
         opt.cellH = opt.cellW / opt.cellScale.w * opt.cellScale.h;
-        opt.cellW_Int = Math.floor(opt.cellW);
-        opt.cellH_Int = Math.floor(opt.cellH);
       },
       init: function () {
         handleEvent.init(true, this.opt);

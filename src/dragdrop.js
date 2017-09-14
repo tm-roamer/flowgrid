@@ -57,15 +57,15 @@ let dragdrop = {
 		this.prevX = event.clientX;
 		this.prevY = event.clientY;
 		// 转换坐标
-		this.pageX = event.clientX;
-		this.pageY = event.clientY;
+		this.clientX = event.clientX;
+		this.clientY = event.clientY;
 		// 判断是缩放还是拖拽
 		this.isResize ? this.resize() : this.position()
 	},
 	position: function () {
 		var flowgrid = this.flowgrid;
-		var x = this.pageX - this.containerX - this.offsetX;
-		var y = this.pageY - this.containerY - this.offsetY;
+		var x = this.clientX - this.containerX - this.offsetX;
+		var y = this.clientY - this.containerY - this.offsetY;
 		// 计算拖拽节点的坐标
 		this.dragElement.style.cssText += ';transform: translate(' + x + 'px,' + y + 'px);';
 		// 极值判断
@@ -76,8 +76,8 @@ let dragdrop = {
 		x + eleW > maxW && (x = maxW - eleW);
 		// 当前拖拽节点的坐标, 转换成对齐网格的坐标
 		var node = this.dragNode.node;
-		var nodeX = Math.round(x / flowgrid.opt.cellW_Int);
-		var nodeY = Math.round(y / flowgrid.opt.cellH_Int);
+		var nodeX = Math.round(x / flowgrid.opt.cellW);
+		var nodeY = Math.round(y / flowgrid.opt.cellH);
 		// 判断坐标是否变化
 		if (node.x !== nodeX || node.y !== nodeY) {
 			node.x = nodeX;
@@ -92,14 +92,14 @@ let dragdrop = {
 		var flowgrid = this.flowgrid,
 			opt = flowgrid.opt,
 			node = this.dragNode.node,
-			minW = node.minW * opt.cellW_Int - opt.padding.left - opt.padding.right - opt.overflow,
-			minH = node.minH * opt.cellH_Int - opt.padding.top - opt.padding.bottom - opt.overflow,
+			minW = node.minW * opt.cellW - opt.padding.left - opt.padding.right - opt.overflow,
+			minH = node.minH * opt.cellH - opt.padding.top - opt.padding.bottom - opt.overflow,
 			translate = this.dragElement.style.transform,
 			coord = translate.replace(/translate.*\(/ig, '').replace(/\).*$/ig, '').replace(/px/ig, '').split(','),
 			x = parseInt(coord[0]),
 			y = parseInt(coord[1]),
-			w = this.pageX - this.containerX - x + this.offsetX,
-			h = this.pageY - this.containerY - y + this.offsetY;
+			w = this.clientX - this.containerX - x + this.offsetX,
+			h = this.clientY - this.containerY - y + this.offsetY;
 		// 极值判断
 		var maxW = opt.containerW;
 		w < minW && (w = minW);
@@ -108,8 +108,8 @@ let dragdrop = {
 		// 计算拖拽节点的宽高
 		this.dragElement.style.cssText += ';width: ' + w + 'px; height: ' + h + 'px;';
 		// 判断宽高是否变化
-		var nodeW = Math.ceil(w / opt.cellW_Int);
-		var nodeH = Math.ceil(h / opt.cellH_Int);
+		var nodeW = Math.ceil(w / opt.cellW);
+		var nodeH = Math.ceil(h / opt.cellH);
 		if (node.w !== nodeW || node.h !== nodeH) {
 			node.w = nodeW;
 			node.h = nodeH;
@@ -145,8 +145,8 @@ let dragdrop = {
 		delete this.dy;
 		delete this.prevX;
 		delete this.prevY;
-		delete this.pageX;
-		delete this.pageY;
+		delete this.clientX;
+		delete this.clientY;
 		delete this.offsetX;
 		delete this.offsetY;
 		delete this.containerX;

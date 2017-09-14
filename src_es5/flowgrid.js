@@ -10,7 +10,7 @@
 ;(function (parent, fun) {
     if (typeof exports !== 'undefined' && typeof module !== 'undefined') {
         module.exports = fun();
-    } else if (typeof define === 'function' 
+    } else if (typeof define === 'function'
                 && (typeof define.amd === 'object' || typeof define.cmd === 'object') ) {
         define(fun);
     } else {
@@ -177,8 +177,8 @@
                 var isResize = dragdrop.isResize;
                 var flowgrid = dragdrop.flowgrid;
                 this.distance = flowgrid.opt.distance;
-                this.pageX = event.pageX;
-                this.pageY = event.pageY;
+                this.clientX = event.clientX;
+                this.clientY = event.clientY;
                 if (flowgrid.opt.draggable) {
                     utils.callbackFun(function () {
                         isResize ? flowgrid.opt.onResizeStart(event, dragdrop.dragElement, dragdrop.dragNode)
@@ -189,11 +189,11 @@
         },
         mousemove: function (event) {
             if (dragdrop.isDrag) {
-                var x = Math.abs(event.pageX - this.pageX);
-                var y = Math.abs(event.pageY - this.pageY);
+                var x = Math.abs(event.clientX - this.clientX);
+                var y = Math.abs(event.clientY - this.clientY);
                 this.triggerDistance = this.distance ? (x >= this.distance || y >= this.distance) : false;
                 if (this.triggerDistance || dragdrop.isResize) {
-                    utils.throttle(new Date().getTime()) && dragdrop.drag(event);    
+                    utils.throttle(new Date().getTime()) && dragdrop.drag(event);
                 }
             }
         },
@@ -206,7 +206,7 @@
                 utils.callbackFun(function () {
                     if (triggerDistance) {
                         isResize ? flowgrid.opt.onResizeEnd(event, dragdrop.dragElement, node)
-                            : flowgrid.opt.onDragEnd(event, dragdrop.dragElement, node);    
+                            : flowgrid.opt.onDragEnd(event, dragdrop.dragElement, node);
                     }
                 });
                 dragdrop.dragend(event);
@@ -215,8 +215,8 @@
         },
         click: function (event) {
             if (this.node) {
-                var x = Math.abs(event.pageX - this.pageX);
-                var y = Math.abs(event.pageY - this.pageY);
+                var x = Math.abs(event.clientX - this.clientX);
+                var y = Math.abs(event.clientY - this.clientY);
                 if (x >= this.distance || y >= this.distance) {
                     event.stopPropagation();
                 }
@@ -281,17 +281,17 @@
                     translateY: value[1] * 1
                 };
             // 赋初值
-            this.prevX || (this.prevX = event.pageX);
-            this.prevY || (this.prevY = event.pageY);
+            this.prevX || (this.prevX = event.clientX);
+            this.prevY || (this.prevY = event.clientY);
             // 计算位移
-            info.dx = event.pageX - this.prevX;
-            info.dy = event.pageY - this.prevY;
+            info.dx = event.clientX - this.prevX;
+            info.dy = event.clientY - this.prevY;
             // 保存当前坐标变成上一次的坐标
-            this.prevX = event.pageX;
-            this.prevY = event.pageY;
+            this.prevX = event.clientX;
+            this.prevY = event.clientY;
             // 转换坐标
-            info.eventX = event.pageX - info.containerX;
-            info.eventY = event.pageY - info.containerY;
+            info.eventX = event.clientX - info.containerX;
+            info.eventY = event.clientY - info.containerY;
             // 判断是不是放大缩小
             if (this.isResize) {
                 this.resize(event, opt, info, flowgrid);
@@ -309,8 +309,8 @@
             // 计算坐标
             this.dragElement.style.cssText += ';transform: translate(' + x + 'px,' + y + 'px);';
             // 当前拖拽节点的坐标, 转换成对齐网格的坐标
-            var nodeX = Math.round(x / opt.cellW_Int);
-            var nodeY = Math.round(y / opt.cellH_Int);
+            var nodeX = Math.round(x / opt.cellW);
+            var nodeY = Math.round(y / opt.cellH);
             // 判断坐标是否变化
             if (node.x !== nodeX || node.y !== nodeY) {
                 flowgrid.replaceNodeInArea(flowgrid.area, node);
@@ -323,8 +323,8 @@
         },
         resize: function (event, opt, info, flowgrid) {
             var node = this.dragNode.node,
-                minW = node.minW * opt.cellW_Int - opt.padding.left - opt.padding.right,
-                minH = node.minH * opt.cellH_Int - opt.padding.top - opt.padding.bottom,
+                minW = node.minW * opt.cellW - opt.padding.left - opt.padding.right,
+                minH = node.minH * opt.cellH - opt.padding.top - opt.padding.bottom,
                 eventW = info.eventX - info.translateX + opt.overflow,
                 eventH = info.eventY - info.translateY + opt.overflow,
                 w = eventW,
@@ -341,8 +341,8 @@
             // 设置宽高
             this.dragElement.style.cssText += ';width: ' + w + 'px; height: ' + h + 'px;';
             // 判断宽高是否变化
-            var nodeW = Math.ceil(w / opt.cellW_Int),
-                nodeH = Math.ceil(h / opt.cellH_Int);
+            var nodeW = Math.ceil(w / opt.cellW),
+                nodeH = Math.ceil(h / opt.cellH);
             if (node.w !== nodeW || node.h !== nodeH) {
                 flowgrid.replaceNodeInArea(flowgrid.area, node);
                 node.w = nodeW;
@@ -481,10 +481,10 @@
                 element.setAttribute('data-fg-y', node.y);
                 element.setAttribute('data-fg-w', node.w);
                 element.setAttribute('data-fg-h', node.h);
-                element.style.cssText += (';transform: translate(' + (node.x * opt.cellW_Int) + 'px,'
-                + (node.y * opt.cellH_Int) + 'px);'
-                + 'width: ' + (node.w * opt.cellW_Int - opt.padding.left - opt.padding.right) + 'px;'
-                + 'height: ' + (node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom) + 'px;');
+                element.style.cssText += (';transform: translate(' + (node.x * opt.cellW + 2 * opt.padding.left) + 'px,'
+                + (node.y * opt.cellH + 2 * opt.padding.top) + 'px);'
+                + 'width: ' + (node.w * opt.cellW - opt.padding.left - opt.padding.right) + 'px;'
+                + 'height: ' + (node.h * opt.cellH - opt.padding.top - opt.padding.bottom) + 'px;');
             }
         },
         clear: function (container) {
@@ -611,12 +611,10 @@
         },
         // 计算最小网格宽高
         computeCellScale: function (opt) {
-            opt.containerW = opt.container.clientWidth;
-            opt.containerH = opt.container.clientHeight;
+            opt.containerW = opt.container.clientWidth - 2 * opt.padding.left;
+            opt.containerH = opt.container.clientHeight - 2 * opt.padding.top;
             opt.cellW = opt.containerW / opt.col;
             opt.cellH = opt.cellW / opt.cellScale.w * opt.cellScale.h;
-            opt.cellW_Int = Math.floor(opt.cellW);
-            opt.cellH_Int = Math.floor(opt.cellH);
             return this;
         },
         // 设置数据

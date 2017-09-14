@@ -43,6 +43,11 @@ npm地址: https://www.npmjs.com/package/flowgrid
 
 ### 更新日志
 
+v3.0.0
+  1. pageX 修改为 clientX
+  2. 删除cellW_Int和cellH_Int
+  3. 修正容器排版左上角的padding.top, padding.left对齐方式
+
 v2.0.2
   1. 补充回调函数dragStart, drag, dragEnd
   2. 补充回调函数resizeStart, resize, resizeEnd

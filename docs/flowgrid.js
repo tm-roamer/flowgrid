@@ -4,7 +4,7 @@
 	(global.flowgrid = factory());
 }(this, (function () { 'use strict';
 
-var version = "2.2.3";
+var version = "3.0.0";
 
 // 常量
 var CONSTANT = {
@@ -149,15 +149,15 @@ var dragdrop = {
 		this.prevX = event.clientX;
 		this.prevY = event.clientY;
 		// 转换坐标
-		this.pageX = event.clientX;
-		this.pageY = event.clientY;
+		this.clientX = event.clientX;
+		this.clientY = event.clientY;
 		// 判断是缩放还是拖拽
 		this.isResize ? this.resize() : this.position();
 	},
 	position: function position() {
 		var flowgrid = this.flowgrid;
-		var x = this.pageX - this.containerX - this.offsetX;
-		var y = this.pageY - this.containerY - this.offsetY;
+		var x = this.clientX - this.containerX - this.offsetX;
+		var y = this.clientY - this.containerY - this.offsetY;
 		// 计算拖拽节点的坐标
 		this.dragElement.style.cssText += ';transform: translate(' + x + 'px,' + y + 'px);';
 		// 极值判断
@@ -168,8 +168,8 @@ var dragdrop = {
 		x + eleW > maxW && (x = maxW - eleW);
 		// 当前拖拽节点的坐标, 转换成对齐网格的坐标
 		var node = this.dragNode.node;
-		var nodeX = Math.round(x / flowgrid.opt.cellW_Int);
-		var nodeY = Math.round(y / flowgrid.opt.cellH_Int);
+		var nodeX = Math.round(x / flowgrid.opt.cellW);
+		var nodeY = Math.round(y / flowgrid.opt.cellH);
 		// 判断坐标是否变化
 		if (node.x !== nodeX || node.y !== nodeY) {
 			node.x = nodeX;
@@ -184,14 +184,14 @@ var dragdrop = {
 		var flowgrid = this.flowgrid,
 		    opt = flowgrid.opt,
 		    node = this.dragNode.node,
-		    minW = node.minW * opt.cellW_Int - opt.padding.left - opt.padding.right - opt.overflow,
-		    minH = node.minH * opt.cellH_Int - opt.padding.top - opt.padding.bottom - opt.overflow,
+		    minW = node.minW * opt.cellW - opt.padding.left - opt.padding.right - opt.overflow,
+		    minH = node.minH * opt.cellH - opt.padding.top - opt.padding.bottom - opt.overflow,
 		    translate = this.dragElement.style.transform,
 		    coord = translate.replace(/translate.*\(/ig, '').replace(/\).*$/ig, '').replace(/px/ig, '').split(','),
 		    x = parseInt(coord[0]),
 		    y = parseInt(coord[1]),
-		    w = this.pageX - this.containerX - x + this.offsetX,
-		    h = this.pageY - this.containerY - y + this.offsetY;
+		    w = this.clientX - this.containerX - x + this.offsetX,
+		    h = this.clientY - this.containerY - y + this.offsetY;
 		// 极值判断
 		var maxW = opt.containerW;
 		w < minW && (w = minW);
@@ -200,8 +200,8 @@ var dragdrop = {
 		// 计算拖拽节点的宽高
 		this.dragElement.style.cssText += ';width: ' + w + 'px; height: ' + h + 'px;';
 		// 判断宽高是否变化
-		var nodeW = Math.ceil(w / opt.cellW_Int);
-		var nodeH = Math.ceil(h / opt.cellH_Int);
+		var nodeW = Math.ceil(w / opt.cellW);
+		var nodeH = Math.ceil(h / opt.cellH);
 		if (node.w !== nodeW || node.h !== nodeH) {
 			node.w = nodeW;
 			node.h = nodeH;
@@ -237,8 +237,8 @@ var dragdrop = {
 		delete this.dy;
 		delete this.prevX;
 		delete this.prevY;
-		delete this.pageX;
-		delete this.pageY;
+		delete this.clientX;
+		delete this.clientY;
 		delete this.offsetX;
 		delete this.offsetY;
 		delete this.containerX;
@@ -290,8 +290,8 @@ var handleEvent = {
 			// 记录位置, 通过比较拖拽距离来判断是否是拖拽, 如果是拖拽则阻止冒泡. 不触发点击事件
 			self.dragStart = true;
 			self.distance = configOption.distance;
-			self.distanceX = event.pageX;
-			self.distanceY = event.pageY;
+			self.distanceX = event.clientX;
+			self.distanceY = event.clientY;
 			self.offsetX = event.offsetX || 0;
 			self.offsetY = event.offsetY || 0;
 		}
@@ -331,8 +331,8 @@ var handleEvent = {
 	},
 	isDrag: function isDrag(event) {
 		var self = handleEvent,
-		    distanceX = Math.abs(event.pageX - self.distanceX || 0),
-		    distanceY = Math.abs(event.pageY - self.distanceY || 0);
+		    distanceX = Math.abs(event.clientX - self.distanceX || 0),
+		    distanceY = Math.abs(event.clientY - self.distanceY || 0);
 		if (self.distance < distanceX || self.distance < distanceY) {
 			return true;
 		}
@@ -368,10 +368,9 @@ var fgContainer = {
   methods: {
     // 计算单元格
     computeCell: function computeCell(opt) {
+      opt.containerW -= 2 * opt.padding.left;
       opt.cellW = opt.containerW / opt.col;
       opt.cellH = opt.cellW / opt.cellScale.w * opt.cellScale.h;
-      opt.cellW_Int = Math.floor(opt.cellW);
-      opt.cellH_Int = Math.floor(opt.cellH);
     },
     init: function init() {
       handleEvent.init(true, this.opt);
@@ -733,10 +732,10 @@ var fgItem = {
     itemStyle: function itemStyle() {
       var opt = this.$parent.opt;
       var node = this.node;
-      this.width = node.w * opt.cellW_Int - opt.padding.left - opt.padding.right;
-      this.height = node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom;
+      this.width = node.w * opt.cellW - opt.padding.left - opt.padding.right;
+      this.height = node.h * opt.cellH - opt.padding.top - opt.padding.bottom;
       return {
-        transform: "translate(" + node.x * opt.cellW_Int + "px," + node.y * opt.cellH_Int + "px)",
+        transform: "translate(" + (node.x * opt.cellW + 2 * opt.padding.left) + "px," + (node.y * opt.cellH + 2 * opt.padding.top) + "px)",
         width: this.width + 'px',
         height: this.height + 'px'
       };

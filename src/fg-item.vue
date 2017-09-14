@@ -23,10 +23,11 @@
       itemStyle: function () {
         let opt = this.$parent.opt;
         let node = this.node;
-        this.width = node.w * opt.cellW_Int - opt.padding.left - opt.padding.right;
-        this.height = node.h * opt.cellH_Int - opt.padding.top - opt.padding.bottom;
+        this.width = node.w * opt.cellW - opt.padding.left - opt.padding.right;
+        this.height = node.h * opt.cellH - opt.padding.top - opt.padding.bottom;
         return {
-          transform: "translate(" + (node.x * opt.cellW_Int) + "px," + (node.y * opt.cellH_Int) + "px)",
+          transform: "translate(" + (node.x * opt.cellW + 2 * opt.padding.left) + "px,"
+                  + (node.y * opt.cellH + 2 * opt.padding.top) + "px)",
           width: this.width + 'px',
           height: this.height + 'px'
         }

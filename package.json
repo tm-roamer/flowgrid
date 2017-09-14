@@ -1,6 +1,6 @@
 {
   "name": "flowgrid",
-  "version": "2.2.3",
+  "version": "3.0.0",
   "author": {
     "name": "tm-roamer",
     "email": "tm165822@163.com"
@@ -18,8 +18,9 @@
   "main": "./docs/flowgrid.min.js",
   "module": "./src/index.js",
   "scripts": {
-    "build": "./node_modules/.bin/rollup --config",
+    "start": "npm run dev",
     "dev": "./node_modules/.bin/rollup --config --watch",
+    "build": "./node_modules/.bin/rollup --config",
     "min": "./node_modules/.bin/uglifyjs docs/flowgrid.js -c -m -o docs/flowgrid.min.js --source-map",
     "prod": "npm run build && npm run min"
   },
