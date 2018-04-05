@@ -62,7 +62,7 @@ flowgrid.js is a plugin for widget layout, 一个轻量简单的网格流布局�
 		    <body>
 		      	<!-- 外层容器 -->
 	    		<div class="fg-container">
-            <div class="fg-layout">
+            <div class="fg-layout"> 
 		            <!-- 节点块 -->
 		            <div class="fg-item" data-fg-x="0" data-fg-y="0" data-fg-w="4" data-fg-h="2">
 		                <!-- 内容区, 摆放展示内容 -->
