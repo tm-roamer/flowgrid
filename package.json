@@ -1,10 +1,7 @@
 {
-  "name": "flowgrid",
+  "name": "@aigodata/flowgrid",
   "version": "3.0.0",
-  "author": {
-    "name": "tm-roamer",
-    "email": "tm165822@163.com"
-  },
+  "author": "https://github.com/orgs/aigodata/people",
   "description": "flowgrid is a component for Vue.js. 一个基于vue的轻量简单的网格流布局插件.",
   "keywords": [
     "vue",
